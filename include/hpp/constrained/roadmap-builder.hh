@@ -21,6 +21,7 @@
 #include <KineoWorks2/kwsDiffusingRdmBuilder.h>
 
 #include <hpp/constrained/fwd.hh>
+#include <hpp/constrained/config-extendor.hh>
 
 namespace hpp {
   namespace constrained {
@@ -173,7 +174,7 @@ namespace hpp {
 				const CkwsConfig & i_cfg,
 				CkwsRoadmapBuilder::EDirection i_direction )
     {
-      CkwsDeviceShPtr device = device();
+      CkwsDeviceShPtr device = T::device();
       CkwsSteeringMethodShPtr sm = device->steeringMethod();
       CkwsValidatorDPCollisionShPtr dpValidator = 
 	device->directPathValidators()->retrieve<CkwsValidatorDPCollision> ();
@@ -194,12 +195,12 @@ namespace hpp {
 	  configIsValid = newConfig->isValid();
 	  if ( configIsValid ) {
 	    CkwsDirectPathShPtr dp = 
-	      steeringMethod->makeDirectPath(startCfg,*newConfig);
+	      sm->makeDirectPath(startCfg,*newConfig);
 	    dpValidator->validate(*dp);
 	    dpIsValid = dp->isValid(); 
 	    if ( dpIsValid ) {
-	      lastAddedNode = roadmapNode ( *newConfig );
-	      roadmapLink ( currentNode, lastAddedNode, dp);
+	      lastAddedNode = T::roadmapNode ( *newConfig );
+	      T::roadmapLink ( currentNode, lastAddedNode, dp);
 	      newConfig = extendor_->extendOneStep ( i_cfg );
 	    } 
 	  }

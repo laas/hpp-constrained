@@ -46,8 +46,8 @@ namespace hpp {
        * @return o_config Extended config. Can be NULL if no extension is possible
        */
       CkwsConfigShPtr
-      extendOneStep(CkwsConfig & extendTo,
-		    CkwsConfig & extendFrom);
+      extendOneStep(const CkwsConfig & extendTo,
+		    const CkwsConfig & extendFrom);
 
       /**
        * \brief Performs one elementary extension on a constrained manifold.
@@ -55,7 +55,7 @@ namespace hpp {
        * @return o_config Extended config. Can be NULL if no extension is possible
        */
       CkwsConfigShPtr
-      extendOneStep(CkwsConfig & extendTo);
+      extendOneStep(const CkwsConfig & extendTo);
 
       /**
        * \brief Sets the length of extensions

@@ -40,15 +40,15 @@ namespace hpp {
     }
 
     CkwsConfigShPtr
-    ConfigExtendor::extendOneStep(CkwsConfig & extendTo,
-				  CkwsConfig & extendFrom)
+    ConfigExtendor::extendOneStep(const CkwsConfig & extendTo,
+				  const CkwsConfig & extendFrom)
     {
       robot_->hppSetCurrentConfig(extendFrom);
       return (extendOneStep(extendTo));
     }
 
     CkwsConfigShPtr
-    ConfigExtendor::extendOneStep(CkwsConfig & extendTo)
+    ConfigExtendor::extendOneStep(const CkwsConfig & extendTo)
     {
       CkwsConfigShPtr currentConfig;
       robot_->getCurrentConfig(currentConfig);

@@ -18,6 +18,7 @@
 #include <hpp/constrained/kws-constraint.hh>
 #include <hpp/constrained/config-projector.hh>
 
+
 namespace hpp {
   namespace constrained {
     KwsConstraint::~KwsConstraint()
