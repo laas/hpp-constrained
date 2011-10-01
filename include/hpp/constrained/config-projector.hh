@@ -50,6 +50,12 @@ namespace hpp {
       resetConstraints();
 
       /**
+       * \brief Sets the stack of constraints.
+       */
+      void
+      setConstraints(std::vector<CjrlGikStateConstraint *> i_soc);
+
+      /**
        * \brief Adds a constraint to soc_.
        */
       void
@@ -72,28 +78,6 @@ namespace hpp {
        */
       ChppGikSolver*
       getGikSolver();
-
-      /**
-       * \brief
-       * Builds a stack of constraints corresponding to fixed double support stability. 
-       * Adds the constraints to soc_
-       * @param i_config Configuration where the feet are at the desired configuration.
-       */
-      /*
-      void
-      buildDoubleSupportStaticStabilityConstraints(CkwsConfigShPtr i_config);
-      */
-      /**
-       * \brief
-       * Builds a stack of constraints corresponding to fixed single support stability. 
-       * Adds the constraints to soc_
-       * @param i_config configuration where the foot is at the desired configuration.
-       * @param rightFootSupporting is the single support foot the right one.
-       */
-      /*
-      void
-      buildSingleSupportStaticStabilityConstraints(CwsConfigShPtr i_config,bool rightFootSupporting);
-      */
 
       /**
        * \brief

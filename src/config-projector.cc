@@ -61,6 +61,15 @@ namespace hpp {
     }
 
     void
+    ConfigProjector::setConstraints(std::vector<CjrlGikStateConstraint *> i_soc)
+    {
+      resetConstraints();
+      for(unsigned int i=0; i<i_soc.size(); i++) {
+	soc_.push_back(i_soc[i]);
+      }
+    }
+
+    void
     ConfigProjector::addConstraint(CjrlGikStateConstraint* newConstraint)
     {
       soc_.push_back(newConstraint);
@@ -86,52 +95,6 @@ namespace hpp {
     {
       return solver_;
     }
-    /*
-    void
-    ConfigProjector::buildDoubleSupportStaticStabilityConstraints(CkwsConfigShPtr i_config)
-    {
-      robot_->hppSetCurrentConfig(i_config);
- 
-      CjrlJoint * rightAnkle = robot_->rightAnkle();
-      matrix4d rightAnkleT = rightAnkle->currentTransformation();
-  
-      CjrlJoint * leftAnkle = robot_->leftAnkle();
-      matrix4d leftAnkleT = leftAnkle->currentTransformation();
-
-      ChppGikTransformationConstraint * rightAnkleConstraint =
-	new ChppGikTransformationConstraint(*robot_,*rightAnkle,vector3d(0,0,0),rightAnkleT);
-
-      ChppGikTransformationConstraint * leftAnkleConstraint =
-	new ChppGikTransformationConstraint(*robot_,*leftAnkle,vector3d(0,0,0),leftAnkleT);
-  
-      vector3d comPos = robot_->positionCenterOfMass();
-      ChppGikComConstraint * comConstraint = 
-	new ChppGikComConstraint(*robot_,comPos[0],comPos[1]);
-
-      soc_.push_back(rightAnkleConstraint);
-      soc_.push_back(leftAnkleConstraint);
-      soc_.push_back(comConstraint);
-    }
-
-    void
-    ConfigProjector::buildSingleSupportStaticStabilityConstraints(CwsConfigShPtr i_config,bool rightFootSupporting)
-    {
-      robot_->hppSetCurrentConfig(i_config);
-
-      CjrlJoint * ankle = isRightFoot ? robot_->rightAnkle() : robot_->leftAnkle();
-      matrix4d ankleT = ankle->currentTransformation();
-
-      ChppGikTransformationConstraint * ankleConstraint =
-	new ChppGikTransformationConstraint(*robot_,*ankle,vector3d(0,0,0),ankleT);
-
-      vector3d comPos = robot_->positionCenterOfMass();
-      ChppGikComConstraint * comConstraint = 
-	new ChppGikComConstraint(*robot_,comPos[0],comPos[1]);
-
-      soc_.push_back(ankleConstraint);
-      soc_.push_back(comConstraint);    
-    }
-    */
 
     ktStatus
     ConfigProjector::project(CkwsConfig & io_config)
