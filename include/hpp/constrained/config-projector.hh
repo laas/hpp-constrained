@@ -22,7 +22,7 @@
 
 #include <KineoWorks2/kwsConfig.h>
 
-# include <jrl/mal/matrixabstractlayer.hh>
+#include <jrl/mal/matrixabstractlayer.hh>
 #include <hpp/gik/core/solver.hh>
 #include <hpp/model/device.hh>
 

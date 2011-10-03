@@ -30,8 +30,10 @@ namespace hpp {
 
       solver_ = new ChppGikSolver(*robot_);
 
-      //TODO -> solver weights have to be set
-      vectorN weightVector;
+
+      vectorN weightVector(robot_->numberDof());
+      for(unsigned int i=0; i< robot_->numberDof(); i++)
+	weightVector(i) = 1;
       solver_->weights(weightVector);
 
       soc_.clear();
