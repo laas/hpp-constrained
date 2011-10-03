@@ -1,4 +1,4 @@
-2// Copyright (C) 2011 by Sebastien Dalibard.
+// Copyright (C) 2011 by Sebastien Dalibard.
 //
 // This file is part of the hpp-constrained.
 //
