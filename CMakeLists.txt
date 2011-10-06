@@ -18,7 +18,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 INCLUDE(cmake/base.cmake)
 INCLUDE(cmake/boost.cmake)
-
+INCLUDE(cmake/cpack.cmake)
 
 SET(PROJECT_NAME hpp-constrained)
 SET(PROJECT_VERSION 0.1)
@@ -41,6 +41,9 @@ SETUP_PROJECT()
 ADD_REQUIRED_DEPENDENCY("hpp-model")
 ADD_REQUIRED_DEPENDENCY("hpp-gik")
 
+# Add dependency toward hpp-constrained library in pkg-config file.
+PKG_CONFIG_APPEND_LIBS("hpp-constrained")
+
 # Search for Boost.
 SET(BOOST_COMPONENTS
   filesystem system thread program_options unit_test_framework)
@@ -55,3 +58,4 @@ IF(DOXYGEN_FOUND)
 ENDIF(DOXYGEN_FOUND)
 
 SETUP_PROJECT_FINALIZE()
+SETUP_PROJECT_CPACK()

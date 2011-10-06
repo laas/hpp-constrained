@@ -57,24 +57,7 @@ namespace hpp {
       CkwsConfigShPtr
       extendOneStep(const CkwsConfig & extendTo);
 
-      /**
-       * \brief Sets the length of extensions
-       */
-      void
-      setExtensionStep(double i_extensionStep);
-
-      /**
-       * \brief Gets the length of extensions
-       */
-      double
-      getExtensionStep();
-
     private:
-      /**
-       * \brief Length of one extension, homogeneous to the result of CkwsDistance::distance()
-       */
-      double extensionStep_;
-
       /**
        * \brief Configuration constraint, used to explore a constrained manifold with an inverse kinematics solver
        */

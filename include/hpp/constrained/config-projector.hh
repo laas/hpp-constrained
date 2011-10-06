@@ -19,6 +19,7 @@
 #define HPP_CONSTRAINED_CONFIG_PROJECTOR_HH
 
 #include <vector>
+#include <set>
 
 #include <KineoWorks2/kwsConfig.h>
 
@@ -30,9 +31,24 @@
 
 namespace hpp {
   namespace constrained {
+
+    struct cfgcomp {
+      bool operator() (const CkwsConfig & cfg1,const CkwsConfig & cfg2) const
+      {
+	if (cfg1 == cfg2) return false;
+	for (unsigned int i=0;i<cfg1.device()->countDofs();i++) {
+	  if ( cfg1.dofValue(i) < cfg2.dofValue(i) )
+	    return true;
+	}
+	return false;
+      }
+    };
+
     class ConfigProjector
     {
     public:
+
+      typedef std::set<CkwsConfig,cfgcomp> cache_t;
       /**
        * \brief Constructor
        */
@@ -154,6 +170,8 @@ namespace hpp {
        * \brief Threshold under which a constraint is  considered as progressing
        */
       double progressThreshold_;
+
+      cache_t cache_;
     };
   } //end of namespace constrained
 } //end of namespace hpp

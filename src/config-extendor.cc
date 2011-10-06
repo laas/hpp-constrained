@@ -25,8 +25,6 @@ namespace hpp {
     ConfigExtendor::ConfigExtendor(hpp::model::DeviceShPtr robot):
       ConfigProjector(robot)
     {
-      extensionStep_=1e-2; //Default value
-
       vectorN config = robot->currentConfiguration();
       vectorN mask (robot->numberDof(),1);
       for(unsigned int i=0; i<6; i++){
@@ -43,44 +41,38 @@ namespace hpp {
     ConfigExtendor::extendOneStep(const CkwsConfig & extendTo,
 				  const CkwsConfig & extendFrom)
     {
-      robot_->hppSetCurrentConfig(extendFrom);
+      /* Putting dynamic robot in extendFrom configuration */
+      std::vector<double> dofs;
+      extendFrom.getDofValues(dofs);
+      vectorN jrlCfg(dofs.size());
+      robot_->kwsToJrlDynamicsDofValues(dofs,jrlCfg);
+      robot_->currentConfiguration(jrlCfg);
+      robot_->computeForwardKinematics();
+
       return (extendOneStep(extendTo));
     }
 
     CkwsConfigShPtr
     ConfigExtendor::extendOneStep(const CkwsConfig & extendTo)
     {
-      CkwsConfigShPtr currentConfig;
-      robot_->getCurrentConfig(currentConfig);
-      std::vector<double> deltaConfig;
-      extendTo.getDofValues(deltaConfig);
+      CkwsConfigShPtr resCfg;
 
-      for(unsigned int i=0; i<deltaConfig.size(); i++){
-	deltaConfig[i]-=currentConfig->dofValue(i);
-      }
+      vectorN currentConfig(robot_->numberDof());
+      currentConfig = robot_->currentConfiguration();
 
-      double delta = robot_->distance()->distance(*currentConfig,extendTo);
-      double epsilon = delta/extensionStep_;
-  
-      std::vector<double> targetConfig(deltaConfig.size());
-      vectorN jrlTargetConfig(deltaConfig.size());
+      std::vector<double> kwsdofs;
+      extendTo.getDofValues(kwsdofs);
+      vectorN jrlextendTo(kwsdofs.size());
+      robot_->kwsToJrlDynamicsDofValues(kwsdofs,jrlextendTo);
 
-      for(unsigned int i=0; i<deltaConfig.size(); i++){
-	double dofValue = currentConfig->dofValue(i);
-	dofValue += epsilon*deltaConfig[i];
-	targetConfig[i]=dofValue;
-      }
-
-      robot_->kwsToJrlDynamicsDofValues(targetConfig,jrlTargetConfig);
-  
-      configConstraint_->target(jrlTargetConfig);
+      configConstraint_->target(jrlextendTo);
       configConstraint_->computeValue();
+
+      double initialValue = norm_2(configConstraint_->value());
 
       addConstraint(configConstraint_);
 
-
       unsigned int n = 0;
-
       double constraintValue = std::numeric_limits<double>::infinity();
       bool didConstraintDecrease = true;
       bool isConstraintSolved = false;
@@ -102,30 +94,23 @@ namespace hpp {
 	optimReturnOK = optimizeOneStep();
 	n++;
       }
-  
       removeLastConstraint();
 
       if (!areConstraintsSatisfied()) {
-	currentConfig.reset();
-	return currentConfig;
+	return resCfg;
       }
 
-      robot_->getCurrentConfig(*currentConfig);
-      return currentConfig;
+      if(norm_2(configConstraint_->value()) > initialValue - progressThreshold_) {
+	return resCfg;
+      }
+ 
+      vectorN jrlCfg = robot_->currentConfiguration();
+      robot_->jrlDynamicsToKwsDofValues(jrlCfg,kwsdofs);
+
+      resCfg = CkwsConfig::create(robot_,kwsdofs);
+      cache_.insert(*resCfg);
+
+      return resCfg;
     }
-
-
-    void
-    ConfigExtendor::setExtensionStep(double i_extensionStep)
-    {
-      extensionStep_ = i_extensionStep;
-    }
-
-    double
-    ConfigExtendor::getExtensionStep()
-    {
-      return extensionStep_;
-    }
-
   } //end of namespace constrained
 } //end of namespace hpp

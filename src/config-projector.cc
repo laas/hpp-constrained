@@ -29,8 +29,7 @@ namespace hpp {
       robot_ = i_robot;
 
       solver_ = new ChppGikSolver(*robot_);
-
-
+     
       vectorN weightVector(robot_->numberDof());
       for(unsigned int i=0; i< robot_->numberDof(); i++)
 	weightVector(i) = 1;
@@ -41,6 +40,8 @@ namespace hpp {
       maxOptimizationSteps_ = 20; //Default value
       solveThreshold_ = 1e-3;
       progressThreshold_ = 1e-4;
+
+      cache_.clear();
     }
 
     ConfigProjector::~ConfigProjector()
@@ -51,6 +52,7 @@ namespace hpp {
 	delete soc_[i];
       }
       soc_.clear();
+      cache_.clear();
     }
 
     void
@@ -60,6 +62,7 @@ namespace hpp {
 	delete soc_[i];
       }
       soc_.clear();
+      cache_.clear();
     }
 
     void
@@ -101,7 +104,17 @@ namespace hpp {
     ktStatus
     ConfigProjector::project(CkwsConfig & io_config)
     {
-      robot_->hppSetCurrentConfig(io_config);
+      std::cout << "Number of configs in cache: " << cache_.size() << std::endl;
+
+      if (cache_.find(io_config)!=cache_.end())
+	return KD_OK;
+
+      std::vector<double> dofs;
+      io_config.getDofValues(dofs);
+      vectorN jrlCfg(dofs.size());
+      robot_->kwsToJrlDynamicsDofValues(dofs,jrlCfg);
+      robot_->currentConfiguration(jrlCfg);
+      robot_->computeForwardKinematics();
   
       std::vector<double> constraintValues(soc_.size(), std::numeric_limits<double>::infinity());
       bool didOneConstraintDecrease = true;
@@ -112,6 +125,7 @@ namespace hpp {
 	      && didOneConstraintDecrease
 	      && optimReturnOK
 	      && (!areConstraintsSatisfied()) ) {
+	
 	didOneConstraintDecrease = false;
 	for (unsigned int i=0; i<soc_.size();i++) {
 	  double value = norm_2(soc_[i]->value());
@@ -124,14 +138,17 @@ namespace hpp {
 	optimReturnOK = optimizeOneStep();
 	n++;
       }
-    
+      
       if (!areConstraintsSatisfied()) {
 	return KD_ERROR;
       }
   
-      vectorN jrlCfg = robot_->currentConfiguration();
-      robot_->hppSetCurrentConfig(jrlCfg);
-      robot_->getCurrentConfig(io_config);
+      jrlCfg = robot_->currentConfiguration();
+      robot_->jrlDynamicsToKwsDofValues(jrlCfg,dofs);
+
+      io_config.setDofValues(dofs);
+      cache_.insert(io_config);
+
       return KD_OK;
     }
 
@@ -156,14 +173,15 @@ namespace hpp {
     bool
     ConfigProjector::areConstraintsSatisfied()
     {
+      bool res = true;
       for(unsigned int i=0; i<soc_.size(); i++){
 	soc_[i]->computeValue();
 	double value = norm_2(soc_[i]->value());
 	if (value > solveThreshold_) {
-	  return false;
+	  res = false;
 	}
       }
-      return true;
+      return res;
     }
 
     bool
@@ -171,11 +189,17 @@ namespace hpp {
     {
       CjrlJoint * rootJoint = robot_->getRootJoint()->jrlJoint();
 
+      /* Store current configuration */
+      vectorN oldConfig = robot_->currentConfiguration();
+
+      double maxValue = 0;
+
       /* Prepare the linear system */
       for(unsigned int i=0; i<soc_.size(); i++) {
 	soc_[i]->jacobianRoot(*rootJoint);
 	soc_[i]->computeJacobian();
 	soc_[i]->computeValue();
+	maxValue = (norm_2(soc_[i]->value()) > maxValue)? norm_2(soc_[i]->value()): maxValue;
       }
 
       solver_->solve(soc_);
@@ -185,8 +209,20 @@ namespace hpp {
       if ( isnan(norm_2(newConfig)) )
 	return false;
 
-      robot_->hppSetCurrentConfig(newConfig);
-  
+      vectorN deltaQ(robot_->numberDof());
+      deltaQ = newConfig - oldConfig;
+
+      double alpha = 0.1;
+      if (maxValue<1.) alpha += -0.3*log(maxValue)/log(10.);
+
+      if (alpha > 1) alpha =1;
+   
+      vectorN newAmortizedConfig(robot_->numberDof());
+      newAmortizedConfig = oldConfig + alpha*deltaQ;
+      
+      robot_->currentConfiguration(newAmortizedConfig);
+      robot_->computeForwardKinematics();
+
       return true;
     }
 
