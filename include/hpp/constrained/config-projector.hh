@@ -104,6 +104,16 @@ namespace hpp {
       ktStatus
       project(CkwsConfig & io_config);
 
+      
+      /**
+       * \brief
+       * Projects a config on the constrained manifold.
+       * @param io_config input/output configuration in jrl-dynamics manner
+       * @return KD_OK | KD_ERROR  the projection might fail
+       */
+      ktStatus
+      project(vectorN & jrlConfig);
+
       /**
        * \brief Sets the maximum number of optimization steps performed when projecting a configuration
        * @param i_nbSteps New maximum value

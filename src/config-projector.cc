@@ -29,7 +29,7 @@ namespace hpp {
       robot_ = i_robot;
 
       solver_ = new ChppGikSolver(*robot_);
-     
+
       vectorN weightVector(robot_->numberDof());
       for(unsigned int i=0; i< robot_->numberDof(); i++)
 	weightVector(i) = 1;
@@ -38,8 +38,8 @@ namespace hpp {
       soc_.clear();
 
       maxOptimizationSteps_ = 20; //Default value
-      solveThreshold_ = 1e-3;
-      progressThreshold_ = 1e-4;
+      solveThreshold_ = 1e-3; //Default value
+      progressThreshold_ = 1e-4; //Default value
 
       cache_.clear();
     }
@@ -47,7 +47,7 @@ namespace hpp {
     ConfigProjector::~ConfigProjector()
     {
       delete solver_;
-  
+
       for(unsigned int i = 0; i < soc_.size(); i++) {
 	delete soc_[i];
       }
@@ -102,35 +102,25 @@ namespace hpp {
     }
 
     ktStatus
-    ConfigProjector::project(CkwsConfig & io_config)
+    ConfigProjector::project(vectorN & jrlConfig)
     {
-      std::cout << "Number of configs in cache: " << cache_.size() << std::endl;
-
-      if (cache_.find(io_config)!=cache_.end())
-	return KD_OK;
-
-      std::vector<double> dofs;
-      io_config.getDofValues(dofs);
-      vectorN jrlCfg(dofs.size());
-      robot_->kwsToJrlDynamicsDofValues(dofs,jrlCfg);
-      robot_->currentConfiguration(jrlCfg);
+      robot_->currentConfiguration(jrlConfig);
       robot_->computeForwardKinematics();
-  
+
       std::vector<double> constraintValues(soc_.size(), std::numeric_limits<double>::infinity());
       bool didOneConstraintDecrease = true;
       bool optimReturnOK = true;
       unsigned int n = 0; //Optimization iterations
 
-      while ( (n < maxOptimizationSteps_) 
+      while ( (n < maxOptimizationSteps_)
 	      && didOneConstraintDecrease
 	      && optimReturnOK
 	      && (!areConstraintsSatisfied()) ) {
-	
 	didOneConstraintDecrease = false;
 	for (unsigned int i=0; i<soc_.size();i++) {
 	  double value = norm_2(soc_[i]->value());
 	  if (value > solveThreshold_) { //This constraint is not solved, has it decreased?
-	    didOneConstraintDecrease = 
+	    didOneConstraintDecrease =
 	      didOneConstraintDecrease || (value < constraintValues[i] - progressThreshold_);
 	  }
 	  constraintValues[i] = value;
@@ -138,17 +128,33 @@ namespace hpp {
 	optimReturnOK = optimizeOneStep();
 	n++;
       }
-      
+
       if (!areConstraintsSatisfied()) {
 	return KD_ERROR;
       }
-  
-      jrlCfg = robot_->currentConfiguration();
+
+      jrlConfig = robot_->currentConfiguration();
+      return KD_OK;
+    }
+
+    ktStatus
+    ConfigProjector::project(CkwsConfig & io_config)
+    {
+      if (cache_.find(io_config)!=cache_.end())
+	return KD_OK;
+
+      std::vector<double> dofs;
+      io_config.getDofValues(dofs);
+      vectorN jrlCfg(dofs.size());
+      robot_->kwsToJrlDynamicsDofValues(dofs,jrlCfg);
+
+      if (project(jrlCfg) != KD_OK)
+	return KD_ERROR;
+
       robot_->jrlDynamicsToKwsDofValues(jrlCfg,dofs);
 
       io_config.setDofValues(dofs);
       cache_.insert(io_config);
-
       return KD_OK;
     }
 
@@ -189,38 +195,21 @@ namespace hpp {
     {
       CjrlJoint * rootJoint = robot_->getRootJoint()->jrlJoint();
 
-      /* Store current configuration */
-      vectorN oldConfig = robot_->currentConfiguration();
-
-      double maxValue = 0;
-
       /* Prepare the linear system */
       for(unsigned int i=0; i<soc_.size(); i++) {
 	soc_[i]->jacobianRoot(*rootJoint);
 	soc_[i]->computeJacobian();
 	soc_[i]->computeValue();
-	maxValue = (norm_2(soc_[i]->value()) > maxValue)? norm_2(soc_[i]->value()): maxValue;
       }
 
       solver_->solve(soc_);
 
       const vectorN newConfig = solver_->solution();
-  
+
       if ( isnan(norm_2(newConfig)) )
 	return false;
 
-      vectorN deltaQ(robot_->numberDof());
-      deltaQ = newConfig - oldConfig;
-
-      double alpha = 0.1;
-      if (maxValue<1.) alpha += -0.3*log(maxValue)/log(10.);
-
-      if (alpha > 1) alpha =1;
-   
-      vectorN newAmortizedConfig(robot_->numberDof());
-      newAmortizedConfig = oldConfig + alpha*deltaQ;
-      
-      robot_->currentConfiguration(newAmortizedConfig);
+      robot_->currentConfiguration(newConfig);
       robot_->computeForwardKinematics();
 
       return true;

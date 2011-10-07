@@ -174,12 +174,6 @@ namespace hpp {
 				const CkwsConfig & i_cfg,
 				CkwsRoadmapBuilder::EDirection i_direction )
     {
-      std::cout << "Entering extend...\t" 
-		<< T::roadmap()->countNodes() << " nodes, "
-		<< T::roadmap()->countConnectedComponents() << " connected Components."
-		<< std::endl;
-
-
       CkwsDeviceShPtr device = T::roadmap()->device();
       CkwsSteeringMethodShPtr sm = device->steeringMethod();
       CkwsValidatorDPCollisionShPtr dpValidator = 
@@ -216,7 +210,10 @@ namespace hpp {
 	      } 
 	      if ( dpIsValid ) {
 		lastAddedNode = T::roadmapNode ( *newConfig );
-		T::roadmapLink ( currentNode, lastAddedNode, dp);
+
+		if ( T::roadmapLink ( currentNode, lastAddedNode, dp) != KD_OK)
+		  dpIsValid = false;
+	
 		currentNode = lastAddedNode;
 		newConfig = extendor_->extendOneStep ( i_cfg );
 	      }

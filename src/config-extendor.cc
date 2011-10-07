@@ -27,9 +27,6 @@ namespace hpp {
     {
       vectorN config = robot->currentConfiguration();
       vectorN mask (robot->numberDof(),1);
-      for(unsigned int i=0; i<6; i++){
-	mask(i)=0;
-      }
       configConstraint_ = new ChppGikConfigurationConstraint(*robot, config, mask);
     }
 
@@ -67,45 +64,31 @@ namespace hpp {
 
       configConstraint_->target(jrlextendTo);
       configConstraint_->computeValue();
-
       double initialValue = norm_2(configConstraint_->value());
 
       addConstraint(configConstraint_);
 
-      unsigned int n = 0;
-      double constraintValue = std::numeric_limits<double>::infinity();
-      bool didConstraintDecrease = true;
-      bool isConstraintSolved = false;
-      bool optimReturnOK = true;
-
-      while ( (n < maxOptimizationSteps_)
-	      && (!isConstraintSolved)
-	      && didConstraintDecrease 
-	      && optimReturnOK ) {
-	configConstraint_->computeValue();
-	double value = norm_2(configConstraint_->value());
-	if (value < solveThreshold_) { 
-	  isConstraintSolved = true;
-	}
-	else {
-	  didConstraintDecrease = ( value < constraintValue - progressThreshold_);
-	  constraintValue = value;
-	}
-	optimReturnOK = optimizeOneStep();
-	n++;
+      if(!optimizeOneStep()) {
+	return resCfg;
       }
       removeLastConstraint();
+
+      currentConfig = robot_->currentConfiguration();
+      if ( project(currentConfig) != KD_OK) {
+	return resCfg;
+      }
+      configConstraint_->computeValue();
+      double newValue  = norm_2(configConstraint_->value());
+
+      if (newValue > initialValue - progressThreshold_) {
+	return resCfg;
+      }
 
       if (!areConstraintsSatisfied()) {
 	return resCfg;
       }
-
-      if(norm_2(configConstraint_->value()) > initialValue - progressThreshold_) {
-	return resCfg;
-      }
  
-      vectorN jrlCfg = robot_->currentConfiguration();
-      robot_->jrlDynamicsToKwsDofValues(jrlCfg,kwsdofs);
+      robot_->jrlDynamicsToKwsDofValues(currentConfig,kwsdofs);
 
       resCfg = CkwsConfig::create(robot_,kwsdofs);
       cache_.insert(*resCfg);
