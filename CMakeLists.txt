@@ -32,6 +32,7 @@ SET(${PROJECT_NAME}_HEADERS
   ${CMAKE_SOURCE_DIR}/include/hpp/constrained/config-extendor.hh
   ${CMAKE_SOURCE_DIR}/include/hpp/constrained/roadmap-builder.hh
   ${CMAKE_SOURCE_DIR}/include/hpp/constrained/kws-constraint.hh
+  ${CMAKE_SOURCE_DIR}/include/hpp/constrained/config-optimizer.hh
   )
 
 SET(CXX_DISABLE_WERROR 1)

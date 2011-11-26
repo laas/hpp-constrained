@@ -21,6 +21,7 @@ SET(${PACKAGE_NAME}_SOURCES
   config-extendor.cc
   config-projector.cc
   kws-constraint.cc
+  config-optimizer.cc
   )
  
 ADD_LIBRARY(hpp-constrained 

@@ -29,6 +29,7 @@ namespace hpp {
     class ConfigProjector;
     class ConfigExtendor;
     KIT_PREDEF_CLASS ( KwsConstraint );
+    class ConfigOptimizer;
   } //end of namespace constrained
 } //end of namespace hpp
 
