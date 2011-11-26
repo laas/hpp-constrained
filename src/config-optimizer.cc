@@ -55,15 +55,17 @@ namespace hpp {
     CkwsPathShPtr
     ConfigOptimizer::optimizeConfig(CkwsConfigShPtr i_cfg)
     {
+      double currentCost = cost(i_cfg);
       //DEBUG
       std::cout << "Entering optimizeConfig()..." << std::endl;
-      std::cout << "\tInitial cost: " << cost(i_cfg) << std::endl;
+      std::cout << "\tInitial cost: " << currentCost << std::endl;
 
       CkwsPathShPtr resultPath = CkwsPath::create(robot_);
 
       //First, try to extend towards goalConfig_
       // Stop if: (1) a collision occurs, OR
       //          (2) we reach a local minimum
+
 
       CkwsSteeringMethodShPtr sm = robot_->steeringMethod();
        CkwsValidatorDPCollisionShPtr dpValidator = 
@@ -81,7 +83,7 @@ namespace hpp {
 	      && dpIsValid ) 
 	{
 	  configIsValid = newConfig->isValid();
-	  if ( configIsValid ) {
+	  if ( configIsValid  && (cost(newConfig) < currentCost) ) {
 	    if (newConfig->isEquivalent(*startCfg)) {
 		configIsValid = false;
 	    }
@@ -100,6 +102,7 @@ namespace hpp {
 		  dpIsValid = false;
 
 		startCfg = newConfig;
+		currentCost = cost(newConfig);
 		newConfig = extendor_->extendOneStep ( *i_cfg );
 	      }
 	    }
@@ -115,18 +118,10 @@ namespace hpp {
 	std::cout << "\tCost after direct extension: " << cost(resultPath->configAtEnd()) << std::endl ;
       }
 
-      if (!newConfig) { //No extension was found, we have reached a collision free local optimum
-
-	//DEBUG
-	std::cout << "\tReturn after direct extension" << std::endl;
-
-	return resultPath;
-      }
-
       //Try to extend in random directions until no improvement is found
 
       CkwsConfigShPtr currentConfig = (resultPath->isEmpty())? i_cfg : resultPath->configAtEnd();
-      double currentCost = cost(currentConfig);
+      currentCost = cost(currentConfig);
       bool didProgress = true;
 
       //DEBUG
