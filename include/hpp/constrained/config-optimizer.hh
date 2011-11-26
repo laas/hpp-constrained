@@ -20,6 +20,7 @@
 
 #include <utility>
 #include <queue>
+#include <vector>
 
 #include <hpp/constrained/fwd.hh>
 #include <hpp/constrained/config-extendor.hh>
@@ -44,7 +45,7 @@ namespace hpp {
       }
     };
 
-    typedef priority_queue<ConfigWithCost,vector<ConfigWithCost>,compareConfigsWithCost> ConfigQueue;
+    typedef std::priority_queue<ConfigWithCost,std::vector<ConfigWithCost>,compareConfigsWithCost> ConfigQueue;
 
     class ConfigOptimizer
     {
@@ -57,7 +58,7 @@ namespace hpp {
        */
       ConfigOptimizer(hpp::model::DeviceShPtr robot,
 		      ConfigExtendor * i_extendor,
-		      CkwsConfigShPtr * i_goalConfig);
+		      CkwsConfigShPtr i_goalConfig);
 
       /**
        * \brief Destructor

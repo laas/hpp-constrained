@@ -17,7 +17,7 @@
 
 #include <map>
 
-#include <KineoWorks2/kwsDiffusingShooter.h>
+#include <KineoWorks2/kwsDiffusionShooter.h>
 
 #include <hpp/constrained/config-optimizer.hh>
 
@@ -26,7 +26,7 @@ namespace hpp {
 
     ConfigOptimizer::ConfigOptimizer(hpp::model::DeviceShPtr robot,
 				     ConfigExtendor * i_extendor,
-				     CkwsConfigShPtr * i_goalConfig):
+				     CkwsConfigShPtr i_goalConfig):
       robot_(robot),
       extendor_(i_extendor),
       goalConfig_(i_goalConfig)
@@ -67,10 +67,10 @@ namespace hpp {
 
       CkwsSteeringMethodShPtr sm = robot_->steeringMethod();
        CkwsValidatorDPCollisionShPtr dpValidator = 
-	device->directPathValidators()->retrieve<CkwsValidatorDPCollision> ();
+	robot_->directPathValidators()->retrieve<CkwsValidatorDPCollision> ();
 
-       CkwsConfigShPtr newConfig = extendor_->extendOneStep ( goalConfig_,
-							      i_cfg);
+       CkwsConfigShPtr newConfig = extendor_->extendOneStep ( *goalConfig_,
+							      *i_cfg);
        
        CkwsConfigShPtr startCfg = i_cfg;
        bool configIsValid = true;
@@ -82,12 +82,12 @@ namespace hpp {
 	{
 	  configIsValid = newConfig->isValid();
 	  if ( configIsValid ) {
-	    if (newConfig->isEquivalent(startCfg) {
+	    if (newConfig->isEquivalent(*startCfg)) {
 		configIsValid = false;
 	    }
 	    else {
 	      CkwsDirectPathShPtr dp = 
-		sm->makeDirectPath(startCfg,*newConfig);
+		sm->makeDirectPath(*startCfg,*newConfig);
 	      if (!dp) {
 		dpIsValid = false;
 	      }
@@ -96,11 +96,11 @@ namespace hpp {
 		dpIsValid = dp->isValid();
 	      } 
 	      if ( dpIsValid ) {
-		if ( resultPath->append(dp) != KD_OK )
+		if ( resultPath->appendDirectPath(dp) != KD_OK )
 		  dpIsValid = false;
 
-		startCfg = newCfg;
-		newConfig = extendor_->extendOneStep ( i_cfg );
+		startCfg = newConfig;
+		newConfig = extendor_->extendOneStep ( *i_cfg );
 	      }
 	    }
 	  }
@@ -143,20 +143,20 @@ namespace hpp {
 	shootRandomConfigsWithCost(currentConfig,q,nbRandCfgs_);
 
 	while ( !q.empty() && !didProgress ) {
-	  CkwsConfigShPtr randCfg = q.top();
+	  CkwsConfigShPtr randConfig = q.top().first;
 	  q.pop();
 
-	  CkwsConfigShPtr newConfig = extendor_->extendOneStep ( randCfg, currentCfg);
+	  CkwsConfigShPtr newConfig = extendor_->extendOneStep ( *randConfig, *currentConfig);
 	  if (newConfig->isValid() && (cost(newConfig) < currentCost) ){
-	    if (!(newConfig->isEquivalent(currentConfig))) {
-	      CkwsDirectPathShPtr dp = sm->makeDirectPath(currentConfig, newConfig);
+	    if (!(newConfig->isEquivalent(*currentConfig))) {
+	      CkwsDirectPathShPtr dp = sm->makeDirectPath(*currentConfig, *newConfig);
 	      dpIsValid = false;
 	      if (dp) {
 		dpValidator->validate(*dp);
 		dpIsValid = dp->isValid();
 	      } 
 	      if ( dpIsValid ) {
-		if ( resultPath->append(dp) == KD_OK ) {
+		if ( resultPath->appendDirectPath(dp) == KD_OK ) {
 		  didProgress = true;
 		  currentConfig = newConfig;
 		  currentCost = cost(currentConfig);
@@ -176,9 +176,9 @@ namespace hpp {
     double
     ConfigOptimizer::cost(CkwsConfigShPtr i_config)
     {
-      CkwsConfigShPtr tmpCfg = CkwsConfig::createCopy(i_config);
+      CkwsConfigShPtr tmpCfg = CkwsConfig::create(*i_config);
       for(unsigned int i=0;i<6;i++) tmpCfg->dofValue(i, goalConfig_->dofValue(i));
-      return distance_->distance(*i_config,*goalConfig);
+      return distance_->distance(*i_config,*goalConfig_);
     }
 
     void
