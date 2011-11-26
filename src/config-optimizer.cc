@@ -34,6 +34,8 @@ namespace hpp {
       step_ = 0.01; //Default value
       distance_ = CkwsDistance::create();
       nbRandCfgs_ = 20; //Default value
+      progressThreshold_ = 1e-5;
+      maxOptimizationSteps_ = 20;
     }
 
     ConfigOptimizer::~ConfigOptimizer()
@@ -68,24 +70,24 @@ namespace hpp {
 
 
       CkwsSteeringMethodShPtr sm = robot_->steeringMethod();
-       CkwsValidatorDPCollisionShPtr dpValidator = 
+      CkwsValidatorDPCollisionShPtr dpValidator = 
 	robot_->directPathValidators()->retrieve<CkwsValidatorDPCollision> ();
 
-       CkwsConfigShPtr newConfig = extendor_->extendOneStep ( *goalConfig_,
-							      *i_cfg);
+      CkwsConfigShPtr newConfig = extendor_->extendOneStep ( *goalConfig_,
+							     *i_cfg);
        
-       CkwsConfigShPtr startCfg = i_cfg;
-       bool configIsValid = true;
-       bool dpIsValid = true;
+      CkwsConfigShPtr startCfg = i_cfg;
+      bool configIsValid = true;
+      bool dpIsValid = true;
 
       while ( newConfig
 	      && configIsValid
 	      && dpIsValid ) 
 	{
-	  configIsValid = newConfig->isValid();
-	  if ( configIsValid  && (cost(newConfig) < currentCost) ) {
+	  configIsValid = newConfig->isValid() && ( cost(newConfig) < currentCost - progressThreshold_);
+	  if ( configIsValid  ) {
 	    if (newConfig->isEquivalent(*startCfg)) {
-		configIsValid = false;
+	      configIsValid = false;
 	    }
 	    else {
 	      CkwsDirectPathShPtr dp = 
@@ -124,12 +126,11 @@ namespace hpp {
       currentCost = cost(currentConfig);
       bool didProgress = true;
 
-      //DEBUG
+
       unsigned int nbOptSteps = 0;
 
-      while (didProgress) {
-
-	//DEBUG
+      while (didProgress
+	     && (nbOptSteps < maxOptimizationSteps_) ) {
 	nbOptSteps++;
 
 	didProgress = false;
@@ -142,19 +143,21 @@ namespace hpp {
 	  q.pop();
 
 	  CkwsConfigShPtr newConfig = extendor_->extendOneStep ( *randConfig, *currentConfig);
-	  if (newConfig->isValid() && (cost(newConfig) < currentCost) ){
-	    if (!(newConfig->isEquivalent(*currentConfig))) {
-	      CkwsDirectPathShPtr dp = sm->makeDirectPath(*currentConfig, *newConfig);
-	      dpIsValid = false;
-	      if (dp) {
-		dpValidator->validate(*dp);
-		dpIsValid = dp->isValid();
-	      } 
-	      if ( dpIsValid ) {
-		if ( resultPath->appendDirectPath(dp) == KD_OK ) {
-		  didProgress = true;
-		  currentConfig = newConfig;
-		  currentCost = cost(currentConfig);
+	  if (newConfig) {
+	    if (newConfig->isValid() && (cost(newConfig) < currentCost - progressThreshold_) ){
+	      if (!(newConfig->isEquivalent(*currentConfig))) {
+		CkwsDirectPathShPtr dp = sm->makeDirectPath(*currentConfig, *newConfig);
+		dpIsValid = false;
+		if (dp) {
+		  dpValidator->validate(*dp);
+		  dpIsValid = dp->isValid();
+		} 
+		if ( dpIsValid ) {
+		  if ( resultPath->appendDirectPath(dp) == KD_OK ) {
+		    didProgress = true;
+		    currentConfig = newConfig;
+		    currentCost = cost(currentConfig);
+		  }
 		}
 	      }
 	    }
@@ -163,7 +166,7 @@ namespace hpp {
       }
 
       //DEBUG
-      std::cout << "\tAfter " << nbOptSteps << " steps, cost is: " << cost(resultPath->configAtEnd()) << std::endl ;
+      std::cout << "\n\tAfter " << nbOptSteps << " steps, cost is: " << cost(resultPath->configAtEnd()) << std::endl ;
 
       return resultPath;
     }
@@ -190,5 +193,5 @@ namespace hpp {
       }
     }
 
- } //end of namespace constrained
+  } //end of namespace constrained
 } //end of namespace hpp

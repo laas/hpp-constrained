@@ -139,6 +139,10 @@ namespace hpp {
        */
       unsigned int nbRandCfgs_;
 
+      double progressThreshold_;
+
+      unsigned int maxOptimizationSteps_;
+
     };
   } //end of namespace constrained
 } //end of namespace hpp
