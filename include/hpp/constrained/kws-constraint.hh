@@ -52,9 +52,7 @@ namespace hpp {
       createCopy ( const KwsConstraintConstShPtr &i_KwsConstrain);
 
       // inherited -- for doc see parent class
-      virtual 
-      KIT_SHARED_PTR(CkwsValidator< CkwsConfig >)
-      clone() const;
+      virtual CkwsValidatorShPtr clone() const;
 
       /**
        * \brief Gets the configuration projector.
@@ -80,9 +78,9 @@ namespace hpp {
       init ( const KwsConstraintWkPtr  & i_weakPtr );
 
     protected:
-      virtual 
-      ktStatus
-      doApply (CkwsConfig &io_config) const;
+      virtual ktStatus
+      doApply (CkwsConfig& io_config,
+	       const CkitParameterMapConstShPtr& parameterMap) const;
 
     private:
       /**

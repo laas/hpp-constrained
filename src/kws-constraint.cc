@@ -42,8 +42,7 @@ namespace hpp {
       return create(i_KwsConstraint->name(),i_KwsConstraint->getConfigProjector());
     }
     
-    KIT_SHARED_PTR(CkwsValidator< CkwsConfig >)
-    KwsConstraint::clone() const
+    CkwsValidatorShPtr KwsConstraint::clone() const
     {
       return  create(name(),getConfigProjector());
     }
@@ -69,8 +68,9 @@ namespace hpp {
       return success;
     }
 
-    ktStatus
-    KwsConstraint::doApply (CkwsConfig &io_config) const
+    ktStatus KwsConstraint::
+    doApply(CkwsConfig& io_config,
+	    const CkitParameterMapConstShPtr& parameterMap) const
     {
        return (projector_->project(io_config));
     }
