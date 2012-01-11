@@ -185,7 +185,7 @@ namespace hpp {
     {
       for(unsigned int i=0;i<nbConfigs;i++) {
 	CkwsConfigShPtr randomConfig = CkwsConfig::create(*i_config);
-	CkwsDiffusionShooter::gaussianShoot(*randomConfig,step_);
+	randomConfig->randomStep (step_);
 	double dist = cost(randomConfig);
 	ConfigWithCost cfg(randomConfig,dist);
 	o_queue.push(cfg);
