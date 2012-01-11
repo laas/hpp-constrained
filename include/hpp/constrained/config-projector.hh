@@ -49,136 +49,80 @@ namespace hpp {
     public:
 
       typedef std::set<CkwsConfig,cfgcomp> cache_t;
-      /**
-       * \brief Constructor
-       */
+      /// Constructor
       ConfigProjector(hpp::model::DeviceShPtr i_robot);
 
-      /**
-       * \brief Destructor
-       */
+      /// Destructor
       ~ConfigProjector();
- 
-      /**
-       * \brief Empty the stack of constraints and delete the corresponding objects.
-       */
-      void
-      resetConstraints();
 
-      /**
-       * \brief Sets the stack of constraints.
-       */
-      void
-      setConstraints(std::vector<CjrlGikStateConstraint *> i_soc);
+      /// Empty the stack of constraints and delete the corresponding objects.
+      void resetConstraints();
 
-      /**
-       * \brief Adds a constraint to soc_.
-       */
-      void
-      addConstraint(CjrlGikStateConstraint* newConstraint);
+      /// Sets the stack of constraints.
+      void setConstraints(std::vector<CjrlGikStateConstraint *> i_soc);
 
-      /**
-       * \brief Removes the last constraint from soc_.
-       */
-      void
-      removeLastConstraint();
+      /// Adds a constraint to soc_.
+      void addConstraint(CjrlGikStateConstraint* newConstraint);
 
-      /**
-       * \brief Removes a constraint from soc_.
-       */
-      void
-      removeConstraint(CjrlGikStateConstraint* rmConstraint);
+      /// Removes the last constraint from soc_.
+      void removeLastConstraint();
 
-      /** 
-       * \brief Get the inverse kinematics solver.
-       */
-      ChppGikSolver*
-      getGikSolver();
+      /// Removes a constraint from soc_.
+      void removeConstraint(CjrlGikStateConstraint* rmConstraint);
 
-      /**
-       * \brief
-       * Projects a config on the constrained manifold.
-       * @param io_config input/output configuration
-       * @return KD_OK | KD_ERROR  the projection might fail
-       */
-      ktStatus
-      project(CkwsConfig & io_config);
+      /// Get the inverse kinematics solver.
+      ChppGikSolver* getGikSolver();
 
-      
-      /**
-       * \brief
-       * Projects a config on the constrained manifold.
-       * @param io_config input/output configuration in jrl-dynamics manner
-       * @return KD_OK | KD_ERROR  the projection might fail
-       */
-      ktStatus
-      project(vectorN & jrlConfig);
+      /// Project a config on the constrained manifold.
+      /// @param io_config input/output configuration
+      /// @return KD_OK | KD_ERROR  the projection might fail
+      ktStatus project(CkwsConfig & io_config);
 
-      /**
-       * \brief Sets the maximum number of optimization steps performed when projecting a configuration
-       * @param i_nbSteps New maximum value
-       */
-      void
-      setMaxNumberOptimizationSteps(unsigned int i_nbSteps);
 
-      /**
-       * \brief Gets the maximum number of optimization steps performed when projecting a configuration
-       * @return o_nbSteps Maximum value
-       */
-      unsigned int
-      getMaxNumberOptimizationSteps();
+      /// Projects a config on the constrained manifold.
+      /// @param io_config input/output configuration in jrl-dynamics manner
+      /// @return KD_OK | KD_ERROR  the projection might fail
+      ktStatus project(vectorN & jrlConfig);
 
-      /**
-       * \brief Gets the associated robot.
-       * @return o_robot Associated robot
-       */
-      hpp::model::DeviceShPtr
-      getRobot();
+      /// Sets the maximum number of iterations when projecting a configuration
+      /// @param i_nbSteps New maximum value
+      void setMaxNumberOptimizationSteps(unsigned int i_nbSteps);
+
+      /// Gets the maximum number of iterations when projecting a configuration
+      /// @return o_nbSteps Maximum value
+      unsigned int getMaxNumberOptimizationSteps();
+
+      /// Gets the associated robot.
+      /// @return o_robot Associated robot
+      hpp::model::DeviceShPtr getRobot();
 
     protected:
-      /**
-       * \brief Checks if the stack of constraints is solved in the current robot configuration.
-       * @return true | false
-       */
-      bool 
-      areConstraintsSatisfied();
+      /// Checks if the stack of constraints is satisfied
+      /// @return true | false
+      /// Configuration is robot current configuration.
+      bool areConstraintsSatisfied();
 
-      /**
-       * \brief Performs one step of optimization. Returns false if no progress is made.
-       * @return true | false
-       */
-      virtual bool
-      optimizeOneStep();
-      
+      /// Performs one step of optimization.
+      /// @return true | false if no progress is made.
+      virtual bool optimizeOneStep();
+
     protected:
-      /**
-       * \brief Pointer to robot
-       */
+      /// Pointer to robot
       hpp::model::DeviceShPtr robot_;
 
-      /**
-       * \brief Inverse kinematic solver
-       */
+      /// Inverse kinematic solver
       ChppGikSolver* solver_;
 
-      /**
-       * \brief Stack of constraints solved by the solver
-       */
+      /// Stack of constraints solved by the solver
       std::vector<CjrlGikStateConstraint*> soc_;
 
-      /**
-       * \brief Maximum number of optimization steps
-       */
+      /// Maximum number of optimization steps
       unsigned int maxOptimizationSteps_;
-  
-      /**
-       * \brief Threshold under which a constraint is  considered solved
-       */
+
+      /// Threshold under which a constraint is  considered solved
       double solveThreshold_;
 
-      /**
-       * \brief Threshold under which a constraint is  considered as progressing
-       */
+      /// Threshold under which a constraint is  considered as progressing
       double progressThreshold_;
 
       cache_t cache_;

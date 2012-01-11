@@ -25,43 +25,46 @@
 
 namespace hpp {
   namespace constrained {
+    /// Configuration extension
+
+    /// This object aims at extending a configuration toward another
+    /// configuration called goal configuration, while remaining on a
+    /// constrained manifold.
+
+    /// The manifold is defined by constraints provided using method
+    /// ConfigProjector::setConstraints.
     class ConfigExtendor : public ConfigProjector
     {
     public:
-      /**
-       * \brief Constructor
-       */
+      /// Constructor
       ConfigExtendor(hpp::model::DeviceShPtr robot);
-      
-      /**
-       * \brief Destructor
-       */
+
+      /// Destructor
       ~ConfigExtendor();
 
-      /**
-       * \brief Performs one elementary extension on a constrained manifold.
-       * @param extendTo Configuration towards which the extension is performed
-       * @param extendFrom Configuration from which the extension is performed, 
-       * can be omitted, the extension then starts from the current configuration
-       * @return o_config Extended config. Can be NULL if no extension is possible
-       */
+      /// Performs one elementary extension on a constrained manifold.
+      /// @param extendTo Configuration towards which the extension is performed
+      /// @param extendFrom Configuration from which the extension is performed,
+      /// can be omitted, the extension then starts from the current
+      /// configuration.
+      /// @return o_config Extended config. Can be NULL if no extension is
+      /// possible
       CkwsConfigShPtr
-      extendOneStep(const CkwsConfig & extendTo,
-		    const CkwsConfig & extendFrom);
+      extendOneStep(const CkwsConfig& extendTo,
+		    const CkwsConfig& extendFrom);
 
-      /**
-       * \brief Performs one elementary extension on a constrained manifold.
-       * @param extendTo Configuration towards which the extension is performed
-       * @return o_config Extended config. Can be NULL if no extension is possible
-       */
+      /// Performs one elementary extension on a constrained manifold.
+      /// @param extendTo Configuration towards which the extension is performed
+      /// @return o_config Extended config. Can be NULL if no extension is
+      /// possible.
       CkwsConfigShPtr
-      extendOneStep(const CkwsConfig & extendTo);
+      extendOneStep(const CkwsConfig& extendTo);
 
     private:
-      /**
-       * \brief Configuration constraint, used to explore a constrained manifold with an inverse kinematics solver
-       */
-      ChppGikConfigurationConstraint * configConstraint_;
+      /// Configuration constraint
+      /// used to explore a constrained manifold with an inverse kinematics
+      /// solver.
+      ChppGikConfigurationConstraint* configConstraint_;
     };
   } //end of namespace constrained
 } //end of namespace hpp

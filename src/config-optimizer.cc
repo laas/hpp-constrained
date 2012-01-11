@@ -53,7 +53,7 @@ namespace hpp {
     {
       return extendor_;
     }
-    
+
     CkwsPathShPtr
     ConfigOptimizer::optimizeConfig(CkwsConfigShPtr i_cfg)
     {
@@ -70,19 +70,19 @@ namespace hpp {
 
 
       CkwsSteeringMethodShPtr sm = robot_->steeringMethod();
-      CkwsValidatorDPCollisionShPtr dpValidator = 
+      CkwsValidatorDPCollisionShPtr dpValidator =
 	robot_->directPathValidators()->retrieve<CkwsValidatorDPCollision> ();
 
       CkwsConfigShPtr newConfig = extendor_->extendOneStep ( *goalConfig_,
 							     *i_cfg);
-       
+
       CkwsConfigShPtr startCfg = i_cfg;
       bool configIsValid = true;
       bool dpIsValid = true;
 
       while ( newConfig
 	      && configIsValid
-	      && dpIsValid ) 
+	      && dpIsValid )
 	{
 	  configIsValid = newConfig->isValid() && ( cost(newConfig) < currentCost - progressThreshold_);
 	  if ( configIsValid  ) {
@@ -90,7 +90,7 @@ namespace hpp {
 	      configIsValid = false;
 	    }
 	    else {
-	      CkwsDirectPathShPtr dp = 
+	      CkwsDirectPathShPtr dp =
 		sm->makeDirectPath(*startCfg,*newConfig);
 	      if (!dp) {
 		dpIsValid = false;
@@ -98,7 +98,7 @@ namespace hpp {
 	      else {
 		dpValidator->validate(*dp);
 		dpIsValid = dp->isValid();
-	      } 
+	      }
 	      if ( dpIsValid ) {
 		if ( resultPath->appendDirectPath(dp) != KD_OK )
 		  dpIsValid = false;
@@ -151,7 +151,7 @@ namespace hpp {
 		if (dp) {
 		  dpValidator->validate(*dp);
 		  dpIsValid = dp->isValid();
-		} 
+		}
 		if ( dpIsValid ) {
 		  if ( resultPath->appendDirectPath(dp) == KD_OK ) {
 		    didProgress = true;
@@ -170,7 +170,7 @@ namespace hpp {
 
       return resultPath;
     }
-    
+
     double
     ConfigOptimizer::cost(CkwsConfigShPtr i_config)
     {
