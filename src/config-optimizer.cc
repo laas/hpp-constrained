@@ -19,6 +19,7 @@
 
 #include <KineoWorks2/kwsDiffusionShooter.h>
 
+#include <hpp/util/debug.hh>
 #include <hpp/constrained/config-optimizer.hh>
 
 namespace hpp {
@@ -58,9 +59,7 @@ namespace hpp {
     ConfigOptimizer::optimizeConfig(CkwsConfigShPtr i_cfg)
     {
       double currentCost = cost(i_cfg);
-      //DEBUG
-      std::cout << "Entering optimizeConfig()..." << std::endl;
-      std::cout << "\tInitial cost: " << currentCost << std::endl;
+      hppDout (info, "\tInitial cost: " << currentCost);
 
       CkwsPathShPtr resultPath = CkwsPath::create(robot_);
 
@@ -112,12 +111,12 @@ namespace hpp {
 	}
 
 
-      //DEBUG
       if (resultPath->isEmpty()) {
-	std::cout << "\tNo direct extension" << std::endl;
+	hppDout (info, "\tNo direct extension");
       }
       else {
-	std::cout << "\tCost after direct extension: " << cost(resultPath->configAtEnd()) << std::endl ;
+	hppDout (info, "\tCost after direct extension: "
+		 << cost(resultPath->configAtEnd())) ;
       }
 
       //Try to extend in random directions until no improvement is found
@@ -165,8 +164,8 @@ namespace hpp {
 	}
       }
 
-      //DEBUG
-      std::cout << "\n\tAfter " << nbOptSteps << " steps, cost is: " << cost(resultPath->configAtEnd()) << std::endl ;
+      hppDout (info, "\n\tAfter " << nbOptSteps << " steps, cost is: "
+	       << cost(resultPath->configAtEnd()));
 
       return resultPath;
     }

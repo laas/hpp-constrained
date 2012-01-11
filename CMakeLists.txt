@@ -39,8 +39,15 @@ SET(CXX_DISABLE_WERROR 1)
 
 SETUP_PROJECT()
 
+# Activate hpp-util logging if requested
+SET (HPP_DEBUG FALSE CACHE BOOL "trigger hpp-util debug output")
+IF (HPP_DEBUG)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHPP_DEBUG")
+ENDIF()
+
 ADD_REQUIRED_DEPENDENCY("hpp-model")
 ADD_REQUIRED_DEPENDENCY("hpp-gik")
+ADD_REQUIRED_DEPENDENCY("hpp-util")
 
 # Add dependency toward hpp-constrained library in pkg-config file.
 PKG_CONFIG_APPEND_LIBS("hpp-constrained")
