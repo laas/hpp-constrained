@@ -32,6 +32,7 @@ namespace hpp {
 
     ConfigExtendor::~ConfigExtendor()
     {
+      if (configConstraint_) delete configConstraint_;
     }
 
     CkwsConfigShPtr

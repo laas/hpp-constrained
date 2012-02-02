@@ -54,7 +54,7 @@ namespace hpp {
       ConfigProjector(hpp::model::DeviceShPtr i_robot);
 
       /// Destructor
-      ~ConfigProjector();
+      virtual ~ConfigProjector();
 
       /// Empty the stack of constraints and delete the corresponding objects.
       void resetConstraints();

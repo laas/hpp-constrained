@@ -46,8 +46,8 @@ namespace hpp {
 
     ConfigProjector::~ConfigProjector()
     {
+      resetConstraints();
       delete solver_;
-
       for(unsigned int i = 0; i < soc_.size(); i++) {
 	delete soc_[i];
       }

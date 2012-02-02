@@ -40,7 +40,7 @@ namespace hpp {
       ConfigExtendor(hpp::model::DeviceShPtr robot);
 
       /// Destructor
-      ~ConfigExtendor();
+      virtual ~ConfigExtendor();
 
       /// Performs one elementary extension on a constrained manifold.
       /// @param extendTo Configuration towards which the extension is performed
