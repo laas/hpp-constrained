@@ -19,9 +19,10 @@ INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
 
 SET(${PACKAGE_NAME}_SOURCES
   config-extendor.cc
-  config-projector.cc
-  kws-constraint.cc
   config-optimizer.cc
+  config-projector.cc
+  goal-config-generator.cc
+  kws-constraint.cc
   )
  
 ADD_LIBRARY(hpp-constrained 

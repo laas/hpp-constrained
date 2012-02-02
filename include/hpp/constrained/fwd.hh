@@ -30,6 +30,7 @@ namespace hpp {
     class ConfigExtendor;
     KIT_PREDEF_CLASS ( KwsConstraint )
     class ConfigOptimizer;
+    class GoalConfigGenerator;
   } //end of namespace constrained
 } //end of namespace hpp
 
