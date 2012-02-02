@@ -227,8 +227,8 @@ namespace hpp {
 
     typedef RoadmapBuilder<CkwsDiffusingRdmBuilder> DiffusingRoadmapBuilder;
     typedef RoadmapBuilder<CkwsIPPRdmBuilder> IppRoadmapBuilder;
-    KIT_POINTER_DEFS ( DiffusingRoadmapBuilder );
-    KIT_POINTER_DEFS ( IppRoadmapBuilder );
+    KIT_POINTER_DEFS ( DiffusingRoadmapBuilder )
+    KIT_POINTER_DEFS ( IppRoadmapBuilder )
 
   } //end of namespace constrained
 } //end of namespace hpp
