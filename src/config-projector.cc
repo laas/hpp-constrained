@@ -101,6 +101,8 @@ namespace hpp {
       return solver_;
     }
 
+    /// In case of failure, the input/output configuration is not
+    /// modified.
     ktStatus
     ConfigProjector::project(vectorN & jrlConfig)
     {
@@ -137,6 +139,8 @@ namespace hpp {
       return KD_OK;
     }
 
+    /// In case of failure, the input/output configuration is not
+    /// modified.
     ktStatus
     ConfigProjector::project(CkwsConfig & io_config)
     {

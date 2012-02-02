@@ -44,6 +44,7 @@ namespace hpp {
       }
     };
 
+    /// Projector onto the sub-manifold defined by non linear constraints
     class ConfigProjector
     {
     public:
@@ -76,12 +77,16 @@ namespace hpp {
       /// Project a config on the constrained manifold.
       /// @param io_config input/output configuration
       /// @return KD_OK | KD_ERROR  the projection might fail
+      /// \note In case of failure, the input/output configuration is not
+      /// modified.
       ktStatus project(CkwsConfig & io_config);
 
 
       /// Projects a config on the constrained manifold.
       /// @param io_config input/output configuration in jrl-dynamics manner
       /// @return KD_OK | KD_ERROR  the projection might fail
+      /// \note In case of failure, the input/output configuration is not
+      /// modified.
       ktStatus project(vectorN & jrlConfig);
 
       /// Sets the maximum number of iterations when projecting a configuration
