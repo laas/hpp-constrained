@@ -21,6 +21,7 @@ SET(${PACKAGE_NAME}_SOURCES
   config-extendor.cc
   config-optimizer.cc
   config-projector.cc
+  config-shooter.cc
   goal-config-generator.cc
   kws-constraint.cc
   )

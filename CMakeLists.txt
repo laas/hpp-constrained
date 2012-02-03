@@ -30,6 +30,7 @@ SET(${PROJECT_NAME}_HEADERS
   ${CMAKE_SOURCE_DIR}/include/hpp/constrained/config-optimizer.hh
   ${CMAKE_SOURCE_DIR}/include/hpp/constrained/config-extendor.hh
   ${CMAKE_SOURCE_DIR}/include/hpp/constrained/config-projector.hh
+  ${CMAKE_SOURCE_DIR}/include/hpp/constrained/config-shooter.hh
   ${CMAKE_SOURCE_DIR}/include/hpp/constrained/fwd.hh
   ${CMAKE_SOURCE_DIR}/include/hpp/constrained/goal-config-generator.hh
   ${CMAKE_SOURCE_DIR}/include/hpp/constrained/kws-constraint.hh

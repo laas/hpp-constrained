@@ -16,43 +16,43 @@
 // License along with hpp-constrained.  If not, see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef HPP_CONSTRAINED_GOAL_CONFIG_GENERATOR_HH
-# define HPP_CONSTRAINED_GOAL_CONFIG_GENERATOR_HH
+#ifndef HPP_CONSTRAINED_CONFIG_SHOOTER_HH
+# define HPP_CONSTRAINED_CONFIG_SHOOTER_HH
 
-# include <hpp/model/device.hh>
-
-# include "hpp/constrained/config-projector.hh"
+# include <hpp/model/fwd.hh>
 # include "hpp/constrained/fwd.hh"
 
 namespace hpp {
   namespace constrained {
-    /// Generate a goal random goal configuration about a given configuration
-    class GoalConfigGenerator : public ConfigProjector
+    /// Shoot a random configuration about a given configuration
+    class ConfigShooter
     {
     public:
-      virtual ~GoalConfigGenerator();
+      virtual ~ConfigShooter();
 
       /// Generate a goal configuration about a given configuration
-      virtual void generate (const CkwsConfig& io_config);
+      
+      /// Configuration is shoot according to a Gaussian law centered at
+      /// the input configuration. The default standard deviation (0.01)
+      /// can be changed by calling ConfigShooter::standardDeviation setter.
+      virtual void shoot (CkwsConfig& io_config) const;
 
-      /// Set configuration shooter
-      void configShooter (const ConfigShooterShPtr& configShooter);
-
-      /// Get config shooter
-      ConfigShooterConstShPtr configShooter () const;
+      void standardDeviation (const double& sigma);
+      double standardDeviation () const;
 
       /// Create object and return shared pointer
-      static GoalConfigGeneratorShPtr create (hpp::model::DeviceShPtr robot);
+      static ConfigShooterShPtr create (hpp::model::DeviceShPtr robot);
     protected:
       /// Constructor that takes a projector onto the goal submanifold.
-      GoalConfigGenerator (hpp::model::DeviceShPtr robot);
+      ConfigShooter (hpp::model::DeviceShPtr robot);
       /// Initialization
-      void init (GoalConfigGeneratorWkPtr wkPtr);
+      void init (ConfigShooterWkPtr wkPtr);
 
     private:
-      GoalConfigGeneratorWkPtr weakPtr_;
-      ConfigShooterShPtr configShooter_;
-    }; // class GoalConfigGenerator
+      model::DeviceShPtr robot_;
+      double standardDeviation_;
+      ConfigShooterWkPtr weakPtr_;
+    }; // class ConfigShooter
   } // namespace constrained
 } //namespace hpp
-#endif // HPP_CONSTRAINED_GOAL_CONFIG_GENERATOR_HH
+#endif // HPP_CONSTRAINED_CONFIG_SHOOTER_HH
