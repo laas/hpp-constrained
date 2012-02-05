@@ -29,6 +29,7 @@ namespace hpp {
     class ConfigProjector;
     class ConfigExtendor;
     class ConfigOptimizer;
+    class ConstraintSet;
     KIT_PREDEF_CLASS (ConfigShooter)
     KIT_PREDEF_CLASS (GoalConfigGenerator)
     KIT_PREDEF_CLASS (KwsConstraint)

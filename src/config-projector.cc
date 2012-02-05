@@ -19,29 +19,29 @@
 
 #include <hpp/constrained/config-projector.hh>
 
+#include <hpp/util/debug.hh>
 #include <hpp/model/joint.hh>
+#include <kwsIO/kwsioConfig.h>
+
+#include "../src/constraint-set.hh"
 
 namespace hpp {
   namespace constrained {
 
-    ConfigProjector::ConfigProjector(hpp::model::DeviceShPtr i_robot)
+    ConfigProjector::ConfigProjector(hpp::model::DeviceShPtr i_robot) :
+      robot_ (i_robot), solver_ (new ChppGikSolver(*robot_)),
+      soc_ (), maxOptimizationSteps_ (20), solveThreshold_ (1e-3),
+      progressThreshold_ (1e-4), cache_ (),
+      constraintSet_ (new ConstraintSet (*robot_.get ()))
+
     {
-      robot_ = i_robot;
-
-      solver_ = new ChppGikSolver(*robot_);
-
       vectorN weightVector(robot_->numberDof());
       for(unsigned int i=0; i< robot_->numberDof(); i++)
 	weightVector(i) = 1;
       solver_->weights(weightVector);
-
-      soc_.clear();
-
-      maxOptimizationSteps_ = 20; //Default value
-      solveThreshold_ = 1e-3; //Default value
-      progressThreshold_ = 1e-4; //Default value
-
-      cache_.clear();
+      // Insert a constraint set as unique task. All other tasks will be
+      // inserted in the constraint set.
+      soc_.push_back (constraintSet_);
     }
 
     ConfigProjector::~ConfigProjector()
@@ -58,10 +58,7 @@ namespace hpp {
     void
     ConfigProjector::resetConstraints()
     {
-      for(unsigned int i = 0; i < soc_.size(); i++) {
-	delete soc_[i];
-      }
-      soc_.clear();
+      constraintSet_->resetConstraints ();
       cache_.clear();
     }
 
@@ -70,29 +67,26 @@ namespace hpp {
     {
       resetConstraints();
       for(unsigned int i=0; i<i_soc.size(); i++) {
-	soc_.push_back(i_soc[i]);
+	addConstraint (i_soc [i]);
       }
     }
 
     void
     ConfigProjector::addConstraint(CjrlGikStateConstraint* newConstraint)
     {
-      soc_.push_back(newConstraint);
+      constraintSet_->addConstraint (newConstraint);
     }
 
     void
     ConfigProjector::removeLastConstraint()
     {
-      soc_.pop_back();
+      constraintSet_->removeLastConstraint ();
     }
 
     void
     ConfigProjector::removeConstraint(CjrlGikStateConstraint* rmConstraint)
     {
-      std::vector<CjrlGikStateConstraint*>::iterator it;
-      for(it = soc_.begin(); it!= soc_.end(); it++) {
-	if ( (*it) == rmConstraint ) soc_.erase(it);
-      }
+      constraintSet_->removeConstraint (rmConstraint);
     }
 
     ChppGikSolver*
@@ -132,6 +126,13 @@ namespace hpp {
       }
 
       if (!areConstraintsSatisfied()) {
+#ifdef HPP_DEBUG
+	std::vector <double> kwsDofVector (robot_->countDofs ());
+	robot_->jrlDynamicsToKwsDofValues(robot_->currentConfiguration(),
+					  kwsDofVector);
+	CkwsConfig kwsConfig (robot_, kwsDofVector);
+#endif
+	hppDout (info, "Projection failed: " << kwsConfig);
 	return KD_ERROR;
       }
 
@@ -207,7 +208,6 @@ namespace hpp {
       }
 
       solver_->solve(soc_);
-
       const vectorN newConfig = solver_->solution();
 
       if ( isnan(norm_2(newConfig)) )
@@ -215,7 +215,6 @@ namespace hpp {
 
       robot_->currentConfiguration(newConfig);
       robot_->computeForwardKinematics();
-
       return true;
     }
 

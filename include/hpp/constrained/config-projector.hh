@@ -45,6 +45,20 @@ namespace hpp {
     };
 
     /// Projector onto the sub-manifold defined by non linear constraints
+
+    /// Objects of this class project a given configuration of a robot onto the
+    /// sub-manifold of the configuration space defined by some non-linear
+    /// constraints.
+
+    /// The non-linear constraints are handled by methods:
+    /// ConfigProjector::setConstraints,
+    /// ConfigProjector::addConstraint,
+    /// ConfigProjector::resetConstraints,
+    /// ConfigProjector::removeLastConstraint.
+
+    /// The constraints are gathered into an object of type ConstraintSet and
+    /// solved by ChppGikSolver solver as a single constraint: no
+    /// prioritization.
     class ConfigProjector
     {
     public:
@@ -57,19 +71,21 @@ namespace hpp {
       virtual ~ConfigProjector();
 
       /// Empty the stack of constraints and delete the corresponding objects.
-      void resetConstraints();
+      virtual void resetConstraints();
 
       /// Sets the stack of constraints.
-      void setConstraints(std::vector<CjrlGikStateConstraint *> i_soc);
+      virtual void setConstraints(std::vector<CjrlGikStateConstraint *> i_soc);
 
-      /// Adds a constraint to soc_.
-      void addConstraint(CjrlGikStateConstraint* newConstraint);
+      /// Add a constraint.
+
+      /// All constraints have the same priority.
+      virtual void addConstraint(CjrlGikStateConstraint* newConstraint);
 
       /// Removes the last constraint from soc_.
-      void removeLastConstraint();
+      virtual void removeLastConstraint();
 
       /// Removes a constraint from soc_.
-      void removeConstraint(CjrlGikStateConstraint* rmConstraint);
+      virtual void removeConstraint(CjrlGikStateConstraint* rmConstraint);
 
       /// Get the inverse kinematics solver.
       ChppGikSolver* getGikSolver();
@@ -102,7 +118,7 @@ namespace hpp {
       hpp::model::DeviceShPtr getRobot();
 
     protected:
-      /// Checks if the stack of constraints is satisfied
+      /// Checks if the set of constraints is satisfied
       /// @return true | false
       /// Configuration is robot current configuration.
       bool areConstraintsSatisfied();
@@ -131,6 +147,8 @@ namespace hpp {
       double progressThreshold_;
 
       cache_t cache_;
+      /// Set of constraints with the same priority level
+      ConstraintSet* constraintSet_;
     };
   } //end of namespace constrained
 } //end of namespace hpp

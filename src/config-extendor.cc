@@ -23,11 +23,13 @@ namespace hpp {
   namespace constrained {
 
     ConfigExtendor::ConfigExtendor(hpp::model::DeviceShPtr robot):
-      ConfigProjector(robot)
+      ConfigProjector(robot), configConstraintPushed_ (false)
     {
       vectorN config = robot->currentConfiguration();
       vectorN mask (robot->numberDof(),1);
-      configConstraint_ = new ChppGikConfigurationConstraint(*robot, config, mask);
+      configConstraint_ =
+	new ChppGikConfigurationConstraint(*robot, config, mask);
+
     }
 
     ConfigExtendor::~ConfigExtendor()
@@ -67,12 +69,11 @@ namespace hpp {
       configConstraint_->computeValue();
       double initialValue = norm_2(configConstraint_->value());
 
-      addConstraint(configConstraint_);
-
+      pushConfigConstraint ();
       if(!optimizeOneStep()) {
 	return resCfg;
       }
-      removeLastConstraint();
+      popConfigConstraint ();
 
       currentConfig = robot_->currentConfiguration();
       if ( project(currentConfig) != KD_OK) {
@@ -88,7 +89,7 @@ namespace hpp {
       if (!areConstraintsSatisfied()) {
 	return resCfg;
       }
- 
+
       robot_->jrlDynamicsToKwsDofValues(currentConfig,kwsdofs);
 
       resCfg = CkwsConfig::create(robot_,kwsdofs);
@@ -96,5 +97,19 @@ namespace hpp {
 
       return resCfg;
     }
+
+    void ConfigExtendor::pushConfigConstraint ()
+    {
+      assert (!configConstraintPushed_);
+      soc_.push_back (configConstraint_);
+      configConstraintPushed_ = true;
+    }
+    void ConfigExtendor::popConfigConstraint ()
+    {
+      assert (configConstraintPushed_);
+      soc_.pop_back ();
+      configConstraintPushed_ = false;
+    }
+
   } //end of namespace constrained
 } //end of namespace hpp

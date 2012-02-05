@@ -61,10 +61,15 @@ namespace hpp {
       extendOneStep(const CkwsConfig& extendTo);
 
     private:
+      /// Push the config constraint into the stack of tasks (lower priority).
+      void pushConfigConstraint ();
+      /// Remove the config constraint from the stack of tasks.
+      void popConfigConstraint ();
       /// Configuration constraint
       /// used to explore a constrained manifold with an inverse kinematics
       /// solver.
       ChppGikConfigurationConstraint* configConstraint_;
+      bool configConstraintPushed_;
     };
   } //end of namespace constrained
 } //end of namespace hpp
