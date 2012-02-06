@@ -74,7 +74,10 @@ namespace hpp {
     void
     ConfigProjector::addConstraint(CjrlGikStateConstraint* newConstraint)
     {
+      hppDout (info, "Constraint dimension: " << newConstraint->dimension ());
       constraintSet_->addConstraint (newConstraint);
+      hppDout (info, "Constraint set dimension: " <<
+	       constraintSet_->dimension ());
     }
 
     void
@@ -135,6 +138,7 @@ namespace hpp {
 	hppDout (info, "Projection failed: " << kwsConfig);
 	return KD_ERROR;
       }
+      hppDout (info, "Projection succeeded.");
 
       jrlConfig = robot_->currentConfiguration();
       return KD_OK;
@@ -205,6 +209,9 @@ namespace hpp {
 	soc_[i]->jacobianRoot(*rootJoint);
 	soc_[i]->computeJacobian();
 	soc_[i]->computeValue();
+	hppDout (info, soc_ [i]->value ());
+	hppDout (info, norm_2 (soc_ [i]->value ()));
+	hppDout (info, soc_ [i]->jacobian ());
       }
 
       solver_->solve(soc_, lambda);

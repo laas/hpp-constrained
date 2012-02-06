@@ -62,11 +62,14 @@ namespace hpp {
 
 	if (project(*randomConfig) == KD_OK) {
 	  //Projection worked
-	  hppDout (info, "config: " << *randomConfig);
+	  hppDout (info, "config projected: " << *randomConfig);
 	  model::DeviceShPtr robot (getRobot());
 	  robot->setCurrentConfig(*randomConfig);
 	  if(!robot->collisionTest()) { //Configuration is collision free
+	    hppDout (info, "no collision.");
 	    return;
+	  } else {
+	    hppDout (info, "collision.");
 	  }
 	} else {
 	  hppDout (info, "Random config: " << *randomConfig);
