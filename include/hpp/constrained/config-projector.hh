@@ -124,8 +124,9 @@ namespace hpp {
       bool areConstraintsSatisfied();
 
       /// Performs one step of optimization.
+      /// \param lambda Coefficient to apply to configuration update <= 1.
       /// @return true | false if no progress is made.
-      virtual bool optimizeOneStep();
+      virtual bool optimizeOneStep (double lambda);
 
     protected:
       /// Pointer to robot

@@ -196,7 +196,7 @@ namespace hpp {
     }
 
     bool
-    ConfigProjector::optimizeOneStep()
+    ConfigProjector::optimizeOneStep (double lambda)
     {
       CjrlJoint * rootJoint = robot_->getRootJoint()->jrlJoint();
 
@@ -207,7 +207,7 @@ namespace hpp {
 	soc_[i]->computeValue();
       }
 
-      solver_->solve(soc_);
+      solver_->solve(soc_, lambda);
       const vectorN newConfig = solver_->solution();
 
       if ( isnan(norm_2(newConfig)) )

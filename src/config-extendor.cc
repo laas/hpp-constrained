@@ -70,7 +70,7 @@ namespace hpp {
       double initialValue = norm_2(configConstraint_->value());
 
       pushConfigConstraint ();
-      if(!optimizeOneStep()) {
+      if(!optimizeOneStep(1.)) {
 	return resCfg;
       }
       popConfigConstraint ();
