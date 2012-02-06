@@ -106,25 +106,31 @@ namespace hpp {
       robot_->currentConfiguration(jrlConfig);
       robot_->computeForwardKinematics();
 
-      std::vector<double> constraintValues(soc_.size(), std::numeric_limits<double>::infinity());
-      bool didOneConstraintDecrease = true;
+      std::vector<double> constraintValues
+	(soc_.size(),std::numeric_limits<double>::infinity());
+      int didOneConstraintDecrease = 2;
       bool optimReturnOK = true;
       unsigned int n = 0; //Optimization iterations
+      double lambda = .1;
+      double lambdaMax = .95;
 
       while ( (n < maxOptimizationSteps_)
 	      && didOneConstraintDecrease
 	      && optimReturnOK
 	      && (!areConstraintsSatisfied()) ) {
-	didOneConstraintDecrease = false;
+	didOneConstraintDecrease --;
 	for (unsigned int i=0; i<soc_.size();i++) {
 	  double value = norm_2(soc_[i]->value());
-	  if (value > solveThreshold_) { //This constraint is not solved, has it decreased?
-	    didOneConstraintDecrease =
-	      didOneConstraintDecrease || (value < constraintValues[i] - progressThreshold_);
+	  if (value > solveThreshold_) {
+	    //This constraint is not solved, has it decreased?
+	    if (value < constraintValues[i]) didOneConstraintDecrease = 3;
 	  }
 	  constraintValues[i] = value;
 	}
-	optimReturnOK = optimizeOneStep();
+	optimReturnOK = optimizeOneStep(lambda);
+	// make lambda tend to lambdaMax
+	hppDout (info, lambda);
+	lambda = lambdaMax - .8*(lambdaMax - lambda);
 	n++;
       }
 
