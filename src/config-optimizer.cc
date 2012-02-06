@@ -164,9 +164,12 @@ namespace hpp {
 	}
       }
 
-      hppDout (info, "\n\tAfter " << nbOptSteps << " steps, cost is: "
-	       << cost(resultPath->configAtEnd()));
-
+      if (!resultPath->isEmpty()) {
+	hppDout (info, "\n\tAfter " << nbOptSteps << " steps, cost is: "
+		 << cost(resultPath->configAtEnd()));
+      } else {
+	resultPath.reset ();
+      }
       return resultPath;
     }
 
