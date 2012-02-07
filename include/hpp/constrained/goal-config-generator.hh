@@ -33,7 +33,10 @@ namespace hpp {
       virtual ~GoalConfigGenerator();
 
       /// Generate a goal configuration about a given configuration
-      virtual void generate (const CkwsConfig& io_config);
+      /// \param io_config initial guess,
+      /// \retval io_config result,
+      /// \return true if success, false otherwise
+      virtual bool generate (CkwsConfig& io_config);
 
       /// Set configuration shooter
       void configShooter (const ConfigShooterShPtr& configShooter);

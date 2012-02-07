@@ -16,6 +16,7 @@
 // License along with hpp-constrained-planner.  If not, see
 // <http://www.gnu.org/licenses/>.
 
+#include <KineoWorks2/kwsConfig.h>
 #include <kwsIO/kwsioConfig.h>
 #include <hpp/util/exception.hh>
 #include <hpp/util/debug.hh>
@@ -50,12 +51,11 @@ namespace hpp {
       weakPtr_ = wkPtr;
     }
 
-    void GoalConfigGenerator::generate (const CkwsConfig& io_config)
+    bool GoalConfigGenerator::generate (CkwsConfig& io_config)
     {
-      bool success = false;
       unsigned int nb_try=0;
       unsigned int nb_maxTry=10;
-      while ( (nb_try < nb_maxTry) && (!success) ) { //Shoot config
+      while (nb_try < nb_maxTry) { //Shoot config
 	nb_try++;
 	CkwsConfigShPtr randomConfig = CkwsConfig::create(io_config);
 	configShooter ()->shoot (*randomConfig);
@@ -67,7 +67,8 @@ namespace hpp {
 	  robot->setCurrentConfig(*randomConfig);
 	  if(!robot->collisionTest()) { //Configuration is collision free
 	    hppDout (info, "no collision.");
-	    return;
+	    io_config = *randomConfig;
+	    return true;
 	  } else {
 	    hppDout (info, "collision.");
 	  }
@@ -75,10 +76,8 @@ namespace hpp {
 	  hppDout (info, "Random config: " << *randomConfig);
 	}
       }
-      if (!success) {
-	HPP_THROW_EXCEPTION (Exception,
-			     "Failed to generate goal configuration");
-      }
+      hppDout (info, "Failed to generate goal configuration");
+      return false;
     }
 
     void GoalConfigGenerator::configShooter
