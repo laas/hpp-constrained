@@ -44,7 +44,7 @@ namespace hpp {
       static
       KIT_SHARED_PTR ( RoadmapBuilder<T> )
       create  ( const CkwsRoadmapShPtr& i_roadmap,
-		ConfigExtendor * i_extendor,
+		ConfigExtendor* i_extendor,
 		const CkwsDiffusionNodePickerShPtr &i_picker = CkwsPickerBasic::create(),
 		const CkwsDiffusionShooterShPtr &i_shooter = CkwsShooterRoadmapBox::create() );
 
@@ -61,8 +61,7 @@ namespace hpp {
        * \brief Gets the config extendor used to generate constrained configurations
        * @return o_configExtendor Config extendor used by the roadmap builder
        */
-      ConfigExtendor * 
-      getConfigExtendor();
+      ConfigExtendor* getConfigExtendor();
 
     protected:
       /**
@@ -78,20 +77,21 @@ namespace hpp {
        * @param         i_weakPtr : weak pointer to the object itself
        * @return        KD_OK | KD_ERROR
        */
-      ktStatus 
+      ktStatus
       init ( const KIT_WEAK_PTR ( RoadmapBuilder<T> ) & i_weakPtr );
 
-      /**
-       * \brief Extend function: extends the roadmap from a node towards a configuration.
-       * @param i_node Node to extend from/to.
-       * @param i_cfg Configuration to extend to/from.
-       * @param i_direction ROADMAP_TO_NODE or NODE_TO_ROADMAP
-       * @return o_node New node added to the roadmap (can be NULL)
-       */
-      CkwsNodeShPtr
-      extend ( const CkwsNodeShPtr & i_node, 
-	       const CkwsConfig & i_cfg,
-	       CkwsRoadmapBuilder::EDirection i_direction );
+      /// Extend the roadmap from a node towards a configuration.
+      /// @param i_node Node to extend from/to.
+      /// @param i_cfg Configuration to extend to/from.
+      /// @param i_direction ROADMAP_TO_NODE or NODE_TO_ROADMAP
+      /// @param i_param parameters passed to the extend method
+      /// @retval o_roadmapBoxWasIncreased whether roadmap box increased
+      /// @return New node added to the roadmap (can be NULL)
+      virtual CkwsNodeShPtr extend (const CkwsNodeShPtr& i_node,
+				    const CkwsConfig& i_cfg,
+				    CkwsRoadmapBuilder::EDirection i_direction,
+				    const CkitParameterMapConstShPtr& i_params,
+				    bool& o_roadmapBoxWasIncreased);
 
     private:
       /**
@@ -101,7 +101,7 @@ namespace hpp {
 
       /**
        * \brief Pointer to a config extendor.
-       */ 
+       */
       ConfigExtendor * extendor_;
 
     };
@@ -121,15 +121,15 @@ namespace hpp {
       RoadmapBuilder<T> * newPtr = new RoadmapBuilder<T> ( i_roadmap, i_extendor );
       KIT_SHARED_PTR ( RoadmapBuilder<T> ) newShPtr ( newPtr );
       KIT_WEAK_PTR ( RoadmapBuilder<T> ) newWkPtr ( newShPtr );
-  
+
       if ( newPtr->init ( newWkPtr ) != KD_OK )
-	{ 
+	{
 	  newShPtr.reset();
 	  return newShPtr;
 	}
       newPtr->diffusionNodePicker ( i_picker );
       newPtr->diffusionShooter ( i_shooter );
- 
+
       return newShPtr;
     }
 
@@ -144,7 +144,7 @@ namespace hpp {
     }
 
     template<class T>
-    ConfigExtendor * 
+    ConfigExtendor *
     RoadmapBuilder<T>::getConfigExtendor()
     {
       return extendor_;
@@ -168,19 +168,20 @@ namespace hpp {
       return res;
     }
 
-    template<class T>
-    CkwsNodeShPtr
-    RoadmapBuilder<T>::extend ( const CkwsNodeShPtr & i_node,
-				const CkwsConfig & i_cfg,
-				CkwsRoadmapBuilder::EDirection i_direction )
+    template<class T> CkwsNodeShPtr
+    RoadmapBuilder<T>::extend (const CkwsNodeShPtr& i_node,
+			       const CkwsConfig& i_cfg,
+			       CkwsRoadmapBuilder::EDirection i_direction,
+			       const CkitParameterMapConstShPtr& i_params,
+			       bool& o_roadmapBoxWasIncreased)
     {
       CkwsDeviceShPtr device = T::roadmap()->device();
       CkwsSteeringMethodShPtr sm = device->steeringMethod();
-      CkwsValidatorDPCollisionShPtr dpValidator = 
+      CkwsValidatorDPCollisionShPtr dpValidator =
 	device->directPathValidators()->retrieve<CkwsValidatorDPCollision> ();
 
       CkwsConfig startCfg = i_node->config ();
-      
+
       CkwsConfigShPtr newConfig = extendor_->extendOneStep ( i_cfg,
 							     startCfg);
       CkwsNodeShPtr currentNode = i_node;
@@ -189,7 +190,7 @@ namespace hpp {
       bool configIsValid = true;
       bool dpIsValid = true;
 
-      while ( newConfig 
+      while ( newConfig
 	      && configIsValid
 	      && dpIsValid )
 	{
@@ -199,7 +200,7 @@ namespace hpp {
 	      newConfig = extendor_->extendOneStep ( i_cfg );
 	    }
 	    else {
-	      CkwsDirectPathShPtr dp = 
+	      CkwsDirectPathShPtr dp =
 		sm->makeDirectPath(startCfg,*newConfig);
 	      if (!dp) {
 		dpIsValid = false;
@@ -207,17 +208,17 @@ namespace hpp {
 	      else {
 		dpValidator->validate(*dp);
 		dpIsValid = dp->isValid();
-	      } 
+	      }
 	      if ( dpIsValid ) {
 		lastAddedNode = T::roadmapNode ( *newConfig );
 
 		if ( T::roadmapLink ( currentNode, lastAddedNode, dp) != KD_OK)
 		  dpIsValid = false;
-	
+
 		currentNode = lastAddedNode;
 		newConfig = extendor_->extendOneStep ( i_cfg );
 	      }
-	      
+
 	    }
 	  }
 	}
@@ -227,8 +228,8 @@ namespace hpp {
 
     typedef RoadmapBuilder<CkwsDiffusingRdmBuilder> DiffusingRoadmapBuilder;
     typedef RoadmapBuilder<CkwsIPPRdmBuilder> IppRoadmapBuilder;
-    KIT_POINTER_DEFS ( DiffusingRoadmapBuilder )
-    KIT_POINTER_DEFS ( IppRoadmapBuilder )
+    KIT_POINTER_DEFS ( DiffusingRoadmapBuilder );
+    KIT_POINTER_DEFS ( IppRoadmapBuilder );
 
   } //end of namespace constrained
 } //end of namespace hpp
