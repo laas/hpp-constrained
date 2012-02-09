@@ -19,6 +19,8 @@
 #define HPP_CONSTRAINED_ROADMAP_BUILDER_HH
 
 #include <KineoWorks2/kwsDiffusingRdmBuilder.h>
+#include <kwsIO/kwsioConfig.h>
+#include <hpp/util/debug.hh>
 
 #include <hpp/constrained/fwd.hh>
 #include <hpp/constrained/config-extendor.hh>
@@ -171,10 +173,12 @@ namespace hpp {
     template<class T> CkwsNodeShPtr
     RoadmapBuilder<T>::extend (const CkwsNodeShPtr& i_node,
 			       const CkwsConfig& i_cfg,
-			       CkwsRoadmapBuilder::EDirection i_direction,
-			       const CkitParameterMapConstShPtr& i_params,
+			       CkwsRoadmapBuilder::EDirection,
+			       const CkitParameterMapConstShPtr&,
 			       bool& o_roadmapBoxWasIncreased)
     {
+      hppDout (info, "from: " << i_node->config ());
+      hppDout (info, "to " << i_cfg);
       CkwsDeviceShPtr device = T::roadmap()->device();
       CkwsSteeringMethodShPtr sm = device->steeringMethod();
       CkwsValidatorDPCollisionShPtr dpValidator =
@@ -222,14 +226,21 @@ namespace hpp {
 	    }
 	  }
 	}
+      if (lastAddedNode) {
+	o_roadmapBoxWasIncreased = true;
+	hppDout (info, "reached: " << lastAddedNode->config ());
+      } else {
+	o_roadmapBoxWasIncreased = false;
+	hppDout (info, "reached: ");
+      }
       return lastAddedNode;
     }
 
 
     typedef RoadmapBuilder<CkwsDiffusingRdmBuilder> DiffusingRoadmapBuilder;
     typedef RoadmapBuilder<CkwsIPPRdmBuilder> IppRoadmapBuilder;
-    KIT_POINTER_DEFS ( DiffusingRoadmapBuilder );
-    KIT_POINTER_DEFS ( IppRoadmapBuilder );
+    KIT_POINTER_DEFS (DiffusingRoadmapBuilder)
+    KIT_POINTER_DEFS (IppRoadmapBuilder)
 
   } //end of namespace constrained
 } //end of namespace hpp

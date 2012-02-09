@@ -215,16 +215,12 @@ namespace hpp {
 	soc_[i]->jacobianRoot(*rootJoint);
 	soc_[i]->computeJacobian();
 	soc_[i]->computeValue();
-	hppDout (info, soc_ [i]->value ());
-	hppDout (info, norm_2 (soc_ [i]->value ()));
-	hppDout (info, soc_ [i]->jacobian ());
       }
 
       solver_->solve(soc_, lambda);
       const vectorN newConfig = solver_->solution();
 
-      if ( isnan(norm_2(newConfig)) )
-	return false;
+      assert (!isnan(norm_2(newConfig)) );
 
       robot_->currentConfiguration(newConfig);
       robot_->computeForwardKinematics();

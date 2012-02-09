@@ -17,7 +17,10 @@
 
 #include <limits>
 
-#include <hpp/constrained/config-extendor.hh>
+#include <hpp/util/debug.hh>
+#include <kwsIO/kwsioConfig.h>
+
+#include "hpp/constrained/config-extendor.hh"
 
 namespace hpp {
   namespace constrained {
@@ -77,12 +80,19 @@ namespace hpp {
 
       currentConfig = robot_->currentConfiguration();
       if ( project(currentConfig) != KD_OK) {
+#ifdef HPP_DEBUG	
+	std::vector <double> dofs (robot_->countDofs ());
+	robot_->jrlDynamicsToKwsDofValues (currentConfig, dofs);
+	CkwsConfig cfg(robot_, dofs);
+#endif
+	hppDout (info, "failed to project configuration: " << cfg);
 	return resCfg;
       }
       configConstraint_->computeValue();
       double newValue  = norm_2(configConstraint_->value());
 
       if (newValue > initialValue - progressThreshold_) {
+	hppDout (info, "distance to config did not decrease.");
 	return resCfg;
       }
 

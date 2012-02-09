@@ -25,6 +25,10 @@
 namespace hpp {
   namespace constrained {
     /// Shoot a random configuration about a given configuration
+
+    /// Configuration is shot according to a Gaussian law centered at
+    /// the input configuration. The default standard deviation (0.01)
+    /// can be changed by calling ConfigShooter::standardDeviation setter.
     class ConfigShooter
     {
     public:
@@ -32,7 +36,7 @@ namespace hpp {
 
       /// Generate a goal configuration about a given configuration
 
-      /// Configuration is shoot according to a Gaussian law centered at
+      /// Configuration is shot according to a Gaussian law centered at
       /// the input configuration. The default standard deviation (0.01)
       /// can be changed by calling ConfigShooter::standardDeviation setter.
       virtual void shoot (CkwsConfig& io_config) const;
