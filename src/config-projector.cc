@@ -48,9 +48,6 @@ namespace hpp {
     {
       resetConstraints();
       delete solver_;
-      for(unsigned int i = 0; i < soc_.size(); i++) {
-	delete soc_[i];
-      }
       soc_.clear();
       cache_.clear();
     }

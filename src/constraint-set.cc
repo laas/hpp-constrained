@@ -27,11 +27,6 @@ namespace hpp {
 
     ConstraintSet::~ConstraintSet ()
     {
-      for (iterator_t it = constraints_.begin (); it != constraints_.end ();
-	   it++) {
-	CjrlGikStateConstraint* constraint = *it;
-	delete constraint;
-      }
     }
 
     ConstraintSet::ConstraintSet (CjrlDynamicRobot& robot) :
@@ -55,7 +50,6 @@ namespace hpp {
       for (iterator_t it = constraints_.begin (); it != constraints_.end ();
 	   it++) {
 	CjrlGikStateConstraint* constraint = *it;
-	delete constraint;
       }
       constraints_.clear ();
       resizeValueAndJacobian ();
@@ -69,7 +63,6 @@ namespace hpp {
 
     void ConstraintSet::removeLastConstraint ()
     {
-      delete constraints_.back ();
       constraints_.pop_back ();
       resizeValueAndJacobian ();
     }
