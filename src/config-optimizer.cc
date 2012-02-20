@@ -18,16 +18,41 @@
 #include <map>
 
 #include <KineoWorks2/kwsDiffusionShooter.h>
+#include <KineoWorks2/kwsDistance.h>
+#include <KineoWorks2/kwsPath.h>
 
 #include <hpp/util/debug.hh>
+#include <hpp/util/exception.hh>
 #include <hpp/constrained/config-optimizer.hh>
 
 namespace hpp {
   namespace constrained {
 
+    ConfigOptimizerShPtr ConfigOptimizer::create (hpp::model::DeviceShPtr robot,
+						  ConfigExtendor* i_extendor,
+						  CkwsConfigShPtr i_goalConfig)
+    {
+      ConfigOptimizer* ptr = new ConfigOptimizer (robot, i_extendor,
+						  i_goalConfig);
+      ConfigOptimizerShPtr shPtr (ptr);
+      ConfigOptimizerWkPtr wkPtr (shPtr);
+
+      ptr->init (wkPtr);
+      return shPtr;
+    }
+
+    void ConfigOptimizer::init (ConfigOptimizerWkPtr wkPtr)
+    {
+      if (CkwsPathPlanner::init (wkPtr) != KD_OK) {
+	HPP_THROW_EXCEPTION (Exception,
+			     "failed to init parent class CkwsPathPlanner.");
+      }
+    }
+
     ConfigOptimizer::ConfigOptimizer(hpp::model::DeviceShPtr robot,
 				     ConfigExtendor * i_extendor,
 				     CkwsConfigShPtr i_goalConfig):
+      CkwsPathPlanner (),
       robot_(robot),
       extendor_(i_extendor),
       goalConfig_(i_goalConfig)
@@ -55,13 +80,20 @@ namespace hpp {
       return extendor_;
     }
 
-    CkwsPathShPtr
-    ConfigOptimizer::optimizeConfig(CkwsConfigShPtr i_cfg)
+    ktStatus
+    ConfigOptimizer::doPlan (const CkwsPathConstShPtr&	i_path,
+			     const std::vector< bool >& stableWayPoints,
+			     CkwsPathShPtr& resultPath)
     {
-      double currentCost = cost(i_cfg);
+      for (std::vector< bool >::const_iterator it = stableWayPoints.begin ();
+	   it != stableWayPoints.end (); it++) {
+	hppDout (info, ((*it) ? std::string("true") : std::string("false")));
+      }
+      CkwsConfigShPtr endConfig = i_path->configAtEnd ();
+      double currentCost = cost(endConfig);
       hppDout (info, "\tInitial cost: " << currentCost);
 
-      CkwsPathShPtr resultPath = CkwsPath::create(robot_);
+      resultPath = CkwsPath::createCopy (i_path);
 
       //First, try to extend towards goalConfig_
       // Stop if: (1) a collision occurs, OR
@@ -73,9 +105,9 @@ namespace hpp {
 	robot_->directPathValidators()->retrieve<CkwsValidatorDPCollision> ();
 
       CkwsConfigShPtr newConfig = extendor_->extendOneStep ( *goalConfig_,
-							     *i_cfg);
+							     *endConfig);
 
-      CkwsConfigShPtr startCfg = i_cfg;
+      CkwsConfigShPtr startCfg = endConfig;
       bool configIsValid = true;
       bool dpIsValid = true;
 
@@ -83,8 +115,9 @@ namespace hpp {
 	      && configIsValid
 	      && dpIsValid )
 	{
-	  configIsValid = newConfig->isValid() && ( cost(newConfig) < currentCost - progressThreshold_);
-	  if ( configIsValid  ) {
+	  configIsValid = newConfig->isValid() &&
+	    (cost(newConfig) < currentCost - progressThreshold_);
+	  if (configIsValid) {
 	    if (newConfig->isEquivalent(*startCfg)) {
 	      configIsValid = false;
 	    }
@@ -104,32 +137,20 @@ namespace hpp {
 
 		startCfg = newConfig;
 		currentCost = cost(newConfig);
-		newConfig = extendor_->extendOneStep ( *i_cfg );
+		newConfig = extendor_->extendOneStep ( *endConfig );
 	      }
 	    }
 	  }
 	}
 
-
-      if (resultPath->isEmpty()) {
-	hppDout (info, "\tNo direct extension");
-      }
-      else {
-	hppDout (info, "\tCost after direct extension: "
-		 << cost(resultPath->configAtEnd())) ;
-      }
-
       //Try to extend in random directions until no improvement is found
-
-      CkwsConfigShPtr currentConfig = (resultPath->isEmpty())? i_cfg : resultPath->configAtEnd();
+      CkwsConfigShPtr currentConfig = resultPath->configAtEnd();
       currentCost = cost(currentConfig);
       bool didProgress = true;
-
-
       unsigned int nbOptSteps = 0;
 
       while (didProgress
-	     && (nbOptSteps < maxOptimizationSteps_) ) {
+	     && (nbOptSteps < maxOptimizationSteps_)) {
 	nbOptSteps++;
 
 	didProgress = false;
@@ -141,11 +162,14 @@ namespace hpp {
 	  CkwsConfigShPtr randConfig = q.top().first;
 	  q.pop();
 
-	  CkwsConfigShPtr newConfig = extendor_->extendOneStep ( *randConfig, *currentConfig);
+	  CkwsConfigShPtr newConfig =
+	    extendor_->extendOneStep (*randConfig, *currentConfig);
 	  if (newConfig) {
-	    if (newConfig->isValid() && (cost(newConfig) < currentCost - progressThreshold_) ){
+	    if (newConfig->isValid() &&
+		(cost(newConfig) < currentCost - progressThreshold_)) {
 	      if (!(newConfig->isEquivalent(*currentConfig))) {
-		CkwsDirectPathShPtr dp = sm->makeDirectPath(*currentConfig, *newConfig);
+		CkwsDirectPathShPtr dp =
+		  sm->makeDirectPath(*currentConfig, *newConfig);
 		dpIsValid = false;
 		if (dp) {
 		  dpValidator->validate(*dp);
@@ -163,14 +187,10 @@ namespace hpp {
 	  }
 	}
       }
-
-      if (!resultPath->isEmpty()) {
-	hppDout (info, "\n\tAfter " << nbOptSteps << " steps, cost is: "
-		 << cost(resultPath->configAtEnd()));
-      } else {
-	resultPath.reset ();
-      }
-      return resultPath;
+      
+      hppDout (info, "\n\tAfter " << nbOptSteps << " steps, cost is: "
+	       << cost(resultPath->configAtEnd()));
+      return KD_OK;
     }
 
     double

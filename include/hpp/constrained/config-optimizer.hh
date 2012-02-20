@@ -22,11 +22,13 @@
 #include <queue>
 #include <vector>
 
-#include <hpp/constrained/fwd.hh>
-#include <hpp/constrained/config-extendor.hh>
+# include <KineoWorks2/kwsPathPlanner.h>
 
-#include <KineoWorks2/kwsPath.h>
-#include <KineoWorks2/kwsDistance.h>
+#include "hpp/constrained/fwd.hh"
+#include "hpp/constrained/config-extendor.hh"
+
+KIT_PREDEF_CLASS (CkwsPath)
+KIT_PREDEF_CLASS (CkwsDistance)
 
 namespace hpp {
   namespace constrained {
@@ -37,38 +39,44 @@ namespace hpp {
      */
 
     typedef std::pair<CkwsConfigShPtr, double> ConfigWithCost;
-    
+
     struct compareConfigsWithCost {
-      bool operator() (const ConfigWithCost& cfg1, const ConfigWithCost& cfg2) const
+      bool operator() (const ConfigWithCost& cfg1,
+		       const ConfigWithCost& cfg2) const
       {
 	return (cfg1.second > cfg2.second);
       }
     };
 
-    typedef std::priority_queue<ConfigWithCost,std::vector<ConfigWithCost>,compareConfigsWithCost> ConfigQueue;
+    typedef std::priority_queue <ConfigWithCost,std::vector <ConfigWithCost>,
+				 compareConfigsWithCost> ConfigQueue;
 
-    class ConfigOptimizer
+    KIT_PREDEF_CLASS (ConfigOptimizer)
+    class ConfigOptimizer : public CkwsPathPlanner
     {
     public:
-      /**
-       * \brief Constructor
-       * @param robot 
-       * @param i_extendor Configuration extendor defining the constrained manifold
-       * @param i_goalConfig Reference configuration
-       */
-      ConfigOptimizer(hpp::model::DeviceShPtr robot,
-		      ConfigExtendor * i_extendor,
-		      CkwsConfigShPtr i_goalConfig);
 
+      /// Return shared pointer to new object.
+      /// @param robot
+      /// @param i_extendor Configuration extendor defining the constrained
+      /// manifold
+      /// @param i_goalConfig Reference configuration
+      static ConfigOptimizerShPtr create (hpp::model::DeviceShPtr robot,
+					  ConfigExtendor* i_extendor,
+					  CkwsConfigShPtr i_goalConfig);
       /**
        * \brief Destructor
        */
       ~ConfigOptimizer();
 
+      virtual ktStatus doPlan (const CkwsPathConstShPtr& i_path,
+			       const std::vector< bool >& i_stableConfigs,
+			       CkwsPathShPtr& o_path);
+
       /**
-       * \brief Optimize a configuration 
+       * \brief Optimize a configuration
        * @param i_cfg Configuration to optimize
-       * @return o_path Collision-free path linking i_cfg 
+       * @return o_path Collision-free path linking i_cfg
        * to the optimized config. Can be empty if no optimization was found.
        */
       CkwsPathShPtr
@@ -77,26 +85,36 @@ namespace hpp {
       /**
        * \brief Get the reference configuration
        * @return o_config
-       */      
+       */
       CkwsConfigShPtr
       getGoalConfig();
 
       /**
        * \brief Gets the config extendor defining the constrained submanifold
-       * @return o_configExtendor 
+       * @return o_configExtendor
        */
-      ConfigExtendor * 
+      ConfigExtendor *
       getConfigExtendor();
 
     protected:
 
-      /**
-       * \brief Shoots configuration in a neighbourhood of an input configuration, 
-       * and computes their distance to goalConfig_
-       * @param i_config Configuration around which we shoot
-       * @param o_queue result priority queue
-       * @param nbConfigs Number of configs to generate
-       */
+      /// Constructor
+      /// @param robot
+      /// @param i_extendor Configuration extendor defining the constrained
+      /// manifold
+      /// @param i_goalConfig Reference configuration
+      ConfigOptimizer (hpp::model::DeviceShPtr robot,
+		       ConfigExtendor* i_extendor,
+		       CkwsConfigShPtr i_goalConfig);
+
+      void init (ConfigOptimizerWkPtr wkPtr);
+
+      /// Shoot configuration in a neighbourhood of an input configuration.
+
+      /// Computes distance to goalConfig_
+      /// @param i_config Configuration around which we shoot
+      /// @param o_queue result priority queue
+      /// @param nbConfigs Number of configs to generate
       void
       shootRandomConfigsWithCost(CkwsConfigShPtr i_config,
 				 ConfigQueue & o_queue,
@@ -107,23 +125,23 @@ namespace hpp {
        */
       double
       cost(CkwsConfigShPtr i_config);
-      
+
     private:
       /**
        * \brief Pointer to robot.
-       */ 
+       */
       hpp::model::DeviceShPtr robot_;
 
       /**
        * \brief Pointer to config extendor.
-       */ 
+       */
       ConfigExtendor * extendor_;
 
       /**
        * \brief Pointer to reference configuration
        */
       CkwsConfigShPtr goalConfig_;
-      
+
       /**
        * \brief Extension step in local optimization
        */
