@@ -64,13 +64,14 @@ namespace hpp {
 	  //Projection worked
 	  hppDout (info, "config projected: " << *randomConfig);
 	  model::DeviceShPtr robot (getRobot());
-	  robot->setCurrentConfig(*randomConfig);
-	  if(!robot->collisionTest()) { //Configuration is collision free
-	    hppDout (info, "no collision.");
+	  robot->configValidators ()->validate (*randomConfig);
+	    if(randomConfig->isValid ()) {
+	    //Configuration is valid
+	    hppDout (info, "Configuration valid.");
 	    io_config = *randomConfig;
 	    return true;
 	  } else {
-	    hppDout (info, "collision.");
+	    hppDout (info, "Configuration unvalid.");
 	  }
 	} else {
 	  hppDout (info, "Random config: " << *randomConfig);
