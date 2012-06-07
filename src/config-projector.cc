@@ -110,11 +110,12 @@ namespace hpp {
       unsigned int n = 0; //Optimization iterations
       double lambda = .1;
       double lambdaMax = .95;
+      bool satisfied = false;
 
       while ( (n < maxOptimizationSteps_)
 	      && didOneConstraintDecrease
 	      && optimReturnOK
-	      && (!areConstraintsSatisfied()) ) {
+	      && (!(satisfied = areConstraintsSatisfied())) ) {
 	didOneConstraintDecrease --;
 	for (unsigned int i=0; i<soc_.size();i++) {
 	  double value = norm_2(soc_[i]->value());
