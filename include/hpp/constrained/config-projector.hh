@@ -35,7 +35,7 @@ namespace hpp {
     struct cfgcomp {
       bool operator() (const CkwsConfig & cfg1,const CkwsConfig & cfg2) const
       {
-	if (cfg1 == cfg2) return false;
+	if (cfg1.isEquivalent (cfg2)) return false;
 	for (unsigned int i=0;i<cfg1.device()->countDofs();i++) {
 	  if ( cfg1.dofValue(i) < cfg2.dofValue(i) )
 	    return true;
