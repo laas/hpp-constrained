@@ -29,7 +29,8 @@ namespace hpp {
     class ConstraintSet : public CjrlGikStateConstraint
     {
     public:
-      typedef std::vector <CjrlGikStateConstraint*>::iterator iterator_t;
+      typedef std::vector <CjrlGikStateConstraint*> constraints_t;
+      typedef constraints_t::iterator iterator_t;
       typedef unsigned int size_type;
       /// \name Add and remove constraints
       /// @{
@@ -66,6 +67,8 @@ namespace hpp {
       //// value 0 cannot.
       vectorN& influencingDofs();
 
+      constraints_t getConstraints () const;
+
       /// \name Value and Jacobian
       /// \{
       unsigned int dimension() const;
@@ -96,7 +99,7 @@ namespace hpp {
     private:
       void resizeValueAndJacobian ();
       CjrlDynamicRobot& robot_;
-      std::vector <CjrlGikStateConstraint*> constraints_;
+      constraints_t constraints_;
       vectorN activeDofs_;
       vectorN value_;
       matrixNxP jacobian_;

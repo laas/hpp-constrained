@@ -102,6 +102,11 @@ namespace hpp {
       return activeDofs_;
     }
 
+    ConstraintSet::constraints_t ConstraintSet::getConstraints () const
+    {
+      return constraints_;
+    }
+
     unsigned int ConstraintSet::dimension () const
     {
       return value_.size ();

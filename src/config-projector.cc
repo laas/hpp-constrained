@@ -68,6 +68,12 @@ namespace hpp {
       }
     }
 
+    std::vector<CjrlGikStateConstraint *>
+    ConfigProjector::getConstraints()
+    {
+      return constraintSet_->getConstraints ();
+    }
+
     void
     ConfigProjector::addConstraint(CjrlGikStateConstraint* newConstraint)
     {

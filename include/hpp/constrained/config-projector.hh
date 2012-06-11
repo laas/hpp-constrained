@@ -76,6 +76,9 @@ namespace hpp {
       /// Sets the stack of constraints.
       virtual void setConstraints(std::vector<CjrlGikStateConstraint *> i_soc);
 
+      /// Get the stack of constraints.
+      virtual std::vector<CjrlGikStateConstraint *> getConstraints();
+
       /// Add a constraint.
 
       /// All constraints have the same priority.
