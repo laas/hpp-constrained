@@ -194,9 +194,7 @@ namespace hpp {
       bool configIsValid = true;
       bool dpIsValid = true;
 
-      while ( newConfig
-	      && configIsValid
-	      && dpIsValid )
+      if (newConfig && configIsValid && dpIsValid)
 	{
 	  configIsValid = newConfig->isValid();
 	  if ( configIsValid ) {
