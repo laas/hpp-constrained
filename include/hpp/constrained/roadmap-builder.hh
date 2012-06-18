@@ -173,65 +173,20 @@ namespace hpp {
     template<class T> CkwsNodeShPtr
     RoadmapBuilder<T>::extend (const CkwsNodeShPtr& i_node,
 			       const CkwsConfig& i_cfg,
-			       CkwsRoadmapBuilder::EDirection,
-			       const CkitParameterMapConstShPtr&,
+			       CkwsRoadmapBuilder::EDirection direction,
+			       const CkitParameterMapConstShPtr& parameters,
 			       bool& o_roadmapBoxWasIncreased)
     {
       hppDout (info, "from: " << i_node->config ());
       hppDout (info, "to " << i_cfg);
-      CkwsDeviceShPtr device = T::roadmap()->device();
-      CkwsSteeringMethodShPtr sm = device->steeringMethod();
-      CkwsValidatorDPCollisionShPtr dpValidator =
-	device->directPathValidators()->retrieve<CkwsValidatorDPCollision> ();
-
       CkwsConfig startCfg = i_node->config ();
-
       CkwsConfigShPtr newConfig = extendor_->extendOneStep ( i_cfg,
 							     startCfg);
-      CkwsNodeShPtr currentNode = i_node;
-      CkwsNodeShPtr lastAddedNode;
-
-      bool configIsValid = true;
-      bool dpIsValid = true;
-
-      if (newConfig)
-	{
-	  configIsValid = newConfig->isValid();
-	  if ( configIsValid ) {
-	    if (newConfig->isEquivalent(currentNode->config())) {
-	      newConfig = extendor_->extendOneStep ( i_cfg );
-	    }
-	    else {
-	      CkwsDirectPathShPtr dp =
-		sm->makeDirectPath(startCfg,*newConfig);
-	      if (!dp) {
-		dpIsValid = false;
-	      }
-	      else {
-		dpValidator->validate(*dp);
-		dpIsValid = dp->isValid();
-	      }
-	      if ( dpIsValid ) {
-		lastAddedNode = T::roadmapNode ( *newConfig );
-
-		if ( T::roadmapLink ( currentNode, lastAddedNode, dp) != KD_OK)
-		  dpIsValid = false;
-
-		currentNode = lastAddedNode;
-		newConfig = extendor_->extendOneStep ( i_cfg );
-	      }
-
-	    }
-	  }
-	}
-      if (lastAddedNode) {
-	o_roadmapBoxWasIncreased = true;
-	hppDout (info, "reached: " << lastAddedNode->config ());
-      } else {
-	o_roadmapBoxWasIncreased = false;
-	hppDout (info, "reached: ");
+      if (newConfig) {
+	return T::extend (i_node, *newConfig, direction, parameters,
+			  o_roadmapBoxWasIncreased);
       }
-      return lastAddedNode;
+      return CkwsNodeShPtr ();
     }
 
 
