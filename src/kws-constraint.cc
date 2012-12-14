@@ -39,12 +39,16 @@ namespace hpp {
     KwsConstraintShPtr
     KwsConstraint::createCopy ( const KwsConstraintConstShPtr &i_KwsConstraint)
     {
-      return create(i_KwsConstraint->name(),i_KwsConstraint->getConfigProjector());
+      KwsConstraint * newPtr = new KwsConstraint(*i_KwsConstraint);
+      KwsConstraintShPtr newShPtr ( newPtr );
+
+      if ( newPtr->init(newShPtr) != KD_OK ) newShPtr.reset();
+      return newShPtr;
     }
     
     CkwsValidatorShPtr KwsConstraint::clone() const
     {
-      return  create(name(),getConfigProjector());
+      return KwsConstraint::createCopy (wkPtr_.lock ());
     }
 
     ConfigProjector *
