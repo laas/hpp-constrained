@@ -20,6 +20,8 @@
 
 #include <KineoWorks2/kwsDiffusingRdmBuilder.h>
 #include <kwsIO/kwsioConfig.h>
+#include <kwsPlus/roadmap/kwsPlusPCARdmBuilder.h>
+#include <kwsPlus/roadmap/kwsPlusLTRdmBuilder.h>
 #include <hpp/util/debug.hh>
 
 #include <hpp/constrained/fwd.hh>
@@ -237,8 +239,16 @@ namespace hpp {
 
     typedef RoadmapBuilder<CkwsDiffusingRdmBuilder> DiffusingRoadmapBuilder;
     typedef RoadmapBuilder<CkwsIPPRdmBuilder> IppRoadmapBuilder;
+    typedef RoadmapBuilder<CkwsPlusPCADiffusingRdmBuilder> PCADiffusingRoadmapBuilder;
+    typedef RoadmapBuilder<CkwsPlusPCAIPPRdmBuilder> PCAIppRoadmapBuilder;
+    typedef RoadmapBuilder<CkwsPlusLTDiffusingRdmBuilder> LTDiffusingRoadmapBuilder;
+    typedef RoadmapBuilder<CkwsPlusLTIPPRdmBuilder> LTIppDiffusingRoadmapBuilder;
     KIT_POINTER_DEFS (DiffusingRoadmapBuilder)
     KIT_POINTER_DEFS (IppRoadmapBuilder)
+    KIT_POINTER_DEFS (PCADiffusingRoadmapBuilder)
+    KIT_POINTER_DEFS (PCAIppRoadmapBuilder)
+    KIT_POINTER_DEFS (LTDiffusingRoadmapBuilder)
+    KIT_POINTER_DEFS (LTIppRoadmapBuilder)
 
   } //end of namespace constrained
 } //end of namespace hpp
