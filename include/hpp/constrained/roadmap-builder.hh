@@ -248,7 +248,7 @@ namespace hpp {
     KIT_POINTER_DEFS (PCADiffusingRoadmapBuilder)
     KIT_POINTER_DEFS (PCAIppRoadmapBuilder)
     KIT_POINTER_DEFS (LTDiffusingRoadmapBuilder)
-    KIT_POINTER_DEFS (LTIppRoadmapBuilder)
+    KIT_POINTER_DEFS (LTIppDiffusingRoadmapBuilder)
 
   } //end of namespace constrained
 } //end of namespace hpp
