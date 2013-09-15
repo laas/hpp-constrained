@@ -58,7 +58,8 @@ namespace hpp {
       goalConfig_(i_goalConfig)
     {
       step_ = 0.01; //Default value
-      distance_ = CkwsDistance::create();
+      //distance_ = CkwsDistance::create();
+      distance_ = CkwsDistanceShPtr();
       nbRandCfgs_ = 20; //Default value
       progressThreshold_ = 1e-5;
       maxOptimizationSteps_ = 20;
