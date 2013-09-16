@@ -36,6 +36,8 @@ namespace hpp {
       /// \param io_config initial guess,
       /// \retval io_config result,
       /// \return true if success, false otherwise
+      /// Shoot up to 10 random configuration and return the first one that
+      /// satisfies the constraints and that is valid.
       virtual bool generate (CkwsConfig& io_config);
 
       /// Set configuration shooter
