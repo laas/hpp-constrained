@@ -50,6 +50,7 @@ ENDIF()
 ADD_REQUIRED_DEPENDENCY("hpp-model")
 ADD_REQUIRED_DEPENDENCY("hpp-gik")
 ADD_REQUIRED_DEPENDENCY("hpp-util")
+ADD_DOC_DEPENDENCY("abstract-gik-task")
 
 # Add dependency toward hpp-constrained library in pkg-config file.
 PKG_CONFIG_APPEND_LIBS("hpp-constrained")
