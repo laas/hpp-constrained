@@ -65,13 +65,24 @@ namespace hpp {
 	  hppDout (info, "config projected: " << *randomConfig);
 	  model::DeviceShPtr robot (getRobot());
 	  robot->configValidators ()->validate (*randomConfig);
-	    if(randomConfig->isValid ()) {
+	  if(randomConfig->isValid ()) {
 	    //Configuration is valid
 	    hppDout (info, "Configuration valid.");
 	    io_config = *randomConfig;
 	    return true;
 	  } else {
 	    hppDout (info, "Configuration unvalid.");
+#ifdef HPP_DEBUG
+	    for(unsigned int i=0; i<randomConfig->countReports(); ++i) {
+	      std::string theValidatorName;
+	      CkwsValidationReportConstShPtr theReport
+		(randomConfig->report(i, theValidatorName));
+	      if(!theReport->isValid()) {
+		hppDout(info, theValidatorName <<
+			" declared the configuration invalid.");
+	      }
+	    }
+#endif
 	  }
 	} else {
 	  hppDout (info, "Random config: " << *randomConfig);
