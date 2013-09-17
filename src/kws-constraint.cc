@@ -59,7 +59,7 @@ namespace hpp {
 
     KwsConstraint::KwsConstraint(const std::string & i_name,
 				 ConfigProjector * i_projector):
-      CkwsConstraint(i_projector->getRobot()->configSpace (), i_name),
+      CkwsConstraint(i_name,i_projector->getRobot()),
       projector_(i_projector)
     {
     }
