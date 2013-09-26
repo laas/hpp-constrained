@@ -21,7 +21,6 @@ INCLUDE(cmake/boost.cmake)
 INCLUDE(cmake/cpack.cmake)
 
 SET(PROJECT_NAME hpp-constrained)
-SET(PROJECT_VERSION 0.1)
 SET(PROJECT_DESCRIPTION "Package dedicated to motion planning on constrained manifolds.")
 SET(PROJECT_URL "https://github.com/laas/hpp-constrained")
 
