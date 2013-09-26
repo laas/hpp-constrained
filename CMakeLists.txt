@@ -47,10 +47,10 @@ IF (HPP_DEBUG)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHPP_DEBUG")
 ENDIF()
 
-ADD_REQUIRED_DEPENDENCY("hpp-model")
-ADD_REQUIRED_DEPENDENCY("hpp-gik")
-ADD_REQUIRED_DEPENDENCY("hpp-util")
-ADD_DOC_DEPENDENCY("abstract-gik-task")
+ADD_REQUIRED_DEPENDENCY("hpp-model >= 2.3")
+ADD_REQUIRED_DEPENDENCY("hpp-gik >= 2.10")
+ADD_REQUIRED_DEPENDENCY("hpp-util >= 0.6")
+ADD_DOC_DEPENDENCY("abstract-gik-task >= 2.7")
 
 # Add dependency toward hpp-constrained library in pkg-config file.
 PKG_CONFIG_APPEND_LIBS("hpp-constrained")
