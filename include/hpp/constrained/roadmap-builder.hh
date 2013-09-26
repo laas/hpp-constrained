@@ -19,9 +19,9 @@
 #define HPP_CONSTRAINED_ROADMAP_BUILDER_HH
 
 #include <KineoWorks2/kwsDiffusingRdmBuilder.h>
-#include <kwsIO/kwsioConfig.h>
-#include <kwsPlus/roadmap/kwsPlusPCARdmBuilder.h>
-#include <kwsPlus/roadmap/kwsPlusLTRdmBuilder.h>
+#include <hpp/kwsio/configuration.hh>
+#include <hpp/kwsplus/roadmap/pca-rdm-builder.hh>
+#include <hpp/kwsplus/roadmap/lt-rdm-builder.hh>
 #include <hpp/util/debug.hh>
 
 #include <hpp/constrained/fwd.hh>
