@@ -21,7 +21,7 @@
 
 #include <hpp/util/debug.hh>
 #include <hpp/model/joint.hh>
-#include <kwsIO/kwsioConfig.h>
+#include <hpp/kwsio/configuration.hh>
 
 #include "../src/constraint-set.hh"
 

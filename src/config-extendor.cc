@@ -18,7 +18,7 @@
 #include <limits>
 
 #include <hpp/util/debug.hh>
-#include <kwsIO/kwsioConfig.h>
+#include <hpp/kwsio/configuration.hh>
 
 #include "hpp/constrained/config-extendor.hh"
 

@@ -17,7 +17,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <KineoWorks2/kwsConfig.h>
-#include <kwsIO/kwsioConfig.h>
+#include <hpp/kwsio/configuration.hh>
 #include <hpp/util/exception.hh>
 #include <hpp/util/debug.hh>
 #include <hpp/model/fwd.hh>
