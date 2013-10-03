@@ -47,10 +47,6 @@ namespace hpp {
 
     void ConstraintSet::resetConstraints()
     {
-      for (iterator_t it = constraints_.begin (); it != constraints_.end ();
-	   it++) {
-	CjrlGikStateConstraint* constraint = *it;
-      }
       constraints_.clear ();
       resizeValueAndJacobian ();
     }
