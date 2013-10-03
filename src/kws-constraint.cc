@@ -74,7 +74,7 @@ namespace hpp {
 
     ktStatus KwsConstraint::
     doApply(CkwsConfig& io_config,
-	    const CkitParameterMapConstShPtr& parameterMap) const
+	    const CkitParameterMapConstShPtr&) const
     {
        return (projector_->project(io_config));
     }
