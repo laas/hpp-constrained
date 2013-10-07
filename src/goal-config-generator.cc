@@ -64,6 +64,7 @@ namespace hpp {
 	  //Projection worked
 	  hppDout (info, "config projected: " << *randomConfig);
 	  model::DeviceShPtr robot (getRobot());
+	  robot->setCurrentConfig (*randomConfig);
 	  robot->configValidators ()->validate (*randomConfig);
 	  if(randomConfig->isValid ()) {
 	    //Configuration is valid
