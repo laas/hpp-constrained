@@ -27,8 +27,8 @@
 #include "hpp/constrained/fwd.hh"
 #include "hpp/constrained/config-extendor.hh"
 
-KIT_PREDEF_CLASS (CkwsPath)
-KIT_PREDEF_CLASS (CkwsDistance)
+HPP_KIT_PREDEF_CLASS (CkwsPath);
+HPP_KIT_PREDEF_CLASS (CkwsDistance);
 
 namespace hpp {
   namespace constrained {
@@ -51,7 +51,7 @@ namespace hpp {
     typedef std::priority_queue <ConfigWithCost,std::vector <ConfigWithCost>,
 				 compareConfigsWithCost> ConfigQueue;
 
-    KIT_PREDEF_CLASS (ConfigOptimizer)
+    HPP_KIT_PREDEF_CLASS (ConfigOptimizer);
     class ConfigOptimizer : public CkwsPathPlanner
     {
     public:

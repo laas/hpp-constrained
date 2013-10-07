@@ -22,7 +22,7 @@
 #ifndef HPP_CONSTRAINED_FWD_HH
 #define HPP_CONSTRAINED_FWD_HH
 
-#include <KineoUtility/kitDefine.h>
+#include <hpp/util/kitelab.hh>
 
 namespace hpp {
   namespace constrained {
@@ -30,9 +30,9 @@ namespace hpp {
     class ConfigExtendor;
     class ConfigOptimizer;
     class ConstraintSet;
-    KIT_PREDEF_CLASS (ConfigShooter)
-    KIT_PREDEF_CLASS (GoalConfigGenerator)
-    KIT_PREDEF_CLASS (KwsConstraint)
+    HPP_KIT_PREDEF_CLASS (ConfigShooter);
+    HPP_KIT_PREDEF_CLASS (GoalConfigGenerator);
+    HPP_KIT_PREDEF_CLASS (KwsConstraint);
   } //end of namespace constrained
 } //end of namespace hpp
 
