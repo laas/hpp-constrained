@@ -48,7 +48,7 @@ ENDIF()
 
 ADD_REQUIRED_DEPENDENCY("hpp-model >= 2.3")
 ADD_REQUIRED_DEPENDENCY("hpp-gik >= 2.10")
-ADD_REQUIRED_DEPENDENCY("hpp-util >= 0.6")
+ADD_REQUIRED_DEPENDENCY("hpp-util >= 0.7")
 ADD_DOC_DEPENDENCY("abstract-gik-task >= 2.7")
 
 # Add dependency toward hpp-constrained library in pkg-config file.
