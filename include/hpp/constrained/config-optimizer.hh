@@ -28,7 +28,6 @@
 #include "hpp/constrained/config-extendor.hh"
 
 HPP_KIT_PREDEF_CLASS (CkwsPath);
-HPP_KIT_PREDEF_CLASS (CkwsDistance);
 
 namespace hpp {
   namespace constrained {
@@ -150,7 +149,7 @@ namespace hpp {
       /**
        * \brief Kineo Distance operator
        */
-      CkwsDistanceShPtr distance_;
+      CkwsMetricShPtr distance_;
 
      /**
        * \brief Number of random configurations shot at each stage of optimization
