@@ -61,6 +61,18 @@ namespace hpp {
       ConfigProjector *
       getConfigProjector() const;
 
+      /// Retrieves subspaces used as inputs and as outputs by the constraint.
+      ///
+      /// \retval inputSpaces spaces the constraint reads from
+      /// (the constraint can read from these spaces;
+      /// it must not read from any other space),
+      /// \retval outputSpaces spaces the constraint writes to
+      /// (the constraint must write to all dofs of these spaces;
+      /// it must not write to any other space).
+      virtual void getTransitivity
+      (std::vector< CkwsConfigSpaceShPtr > &inputSpaces,
+       std::vector< CkwsConfigSpaceShPtr > &outputSpaces) const;
+
     protected:
       /**
        * \brief Constructor

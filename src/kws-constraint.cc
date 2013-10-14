@@ -45,7 +45,14 @@ namespace hpp {
       if ( newPtr->init(newShPtr) != KD_OK ) newShPtr.reset();
       return newShPtr;
     }
-    
+
+    void KwsConstraint::getTransitivity
+    (std::vector< CkwsConfigSpaceShPtr > &inputSpaces,
+     std::vector< CkwsConfigSpaceShPtr > &outputSpaces) const
+    {
+      inputSpaces.push_back (configSpace ());
+    }
+
     CkwsValidatorShPtr KwsConstraint::clone() const
     {
       return KwsConstraint::createCopy (wkPtr_.lock ());
