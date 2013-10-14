@@ -37,7 +37,7 @@ namespace hpp {
        * @param  i_projector The configuration projector used by the constraint
        * @return o_kwsConstraint Newly allocated kineo constraint
        */
-      static 
+      static
       KwsConstraintShPtr
       create (const std::string & i_name,
 	      ConfigProjector * i_projector);
@@ -47,7 +47,7 @@ namespace hpp {
        * @param i_KwsConstraint The kineo constraint to copy
        * @return o_kwsconstraint New kineo constraint
        */
-      static 
+      static
       KwsConstraintShPtr
       createCopy ( const KwsConstraintConstShPtr &i_KwsConstrain);
 
@@ -86,7 +86,7 @@ namespace hpp {
        * @param         i_weakPtr : weak pointer to the object
        * @return        KD_OK | KD_ERROR
        */
-      ktStatus 
+      ktStatus
       init ( const KwsConstraintWkPtr  & i_weakPtr );
 
     protected:
@@ -102,7 +102,7 @@ namespace hpp {
 
       /**
        * \brief Pointer to a config projector.
-       */ 
+       */
       ConfigProjector * projector_;
 
     };
