@@ -101,8 +101,7 @@ namespace hpp {
 
 
       CkwsSteeringMethodShPtr sm = robot_->steeringMethod();
-      CkwsValidatorDPCollisionShPtr dpValidator =
-	robot_->directPathValidators()->retrieve<CkwsValidatorDPCollision> ();
+      CkwsValidatorSetConstShPtr dpValidators (robot_->directPathValidators());
 
       CkwsConfigShPtr newConfig = extendor_->extendOneStep ( *goalConfig_,
 							     *endConfig);
@@ -128,7 +127,7 @@ namespace hpp {
 		dpIsValid = false;
 	      }
 	      else {
-		dpValidator->validate(*dp);
+		dpValidators->validate(*dp);
 		dpIsValid = dp->isValid();
 	      }
 	      if ( dpIsValid ) {
@@ -172,7 +171,7 @@ namespace hpp {
 		  sm->makeDirectPath(*currentConfig, *newConfig);
 		dpIsValid = false;
 		if (dp) {
-		  dpValidator->validate(*dp);
+		  dpValidators->validate(*dp);
 		  dpIsValid = dp->isValid();
 		}
 		if ( dpIsValid ) {

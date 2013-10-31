@@ -183,8 +183,7 @@ namespace hpp {
       hppDout (info, "to " << i_cfg);
       CkwsDeviceShPtr device = T::roadmap()->device();
       CkwsSteeringMethodShPtr sm = device->steeringMethod();
-      CkwsValidatorDPCollisionShPtr dpValidator =
-	device->directPathValidators()->retrieve<CkwsValidatorDPCollision> ();
+      CkwsValidatorSetConstShPtr dpValidators (device->directPathValidators());
 
       CkwsConfig startCfg = i_node->config ();
 
@@ -210,7 +209,7 @@ namespace hpp {
 		dpIsValid = false;
 	      }
 	      else {
-		dpValidator->validate(*dp);
+		dpValidators->validate (*dp);
 		dpIsValid = dp->isValid();
 	      }
 	      if ( dpIsValid ) {
